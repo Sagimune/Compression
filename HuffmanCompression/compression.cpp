@@ -98,23 +98,23 @@ void Compression::Zip(QString path)
     QFile openfile(path);
     if(!openfile.open(QIODevice::ReadOnly))
     {
-        QMessageBox::information(NULL,QString("Warming"),QString("Can't open this file"));
+        QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
         return;
     }
     Weightmap_Init(openfile);
     Container_Init();
     HuffmanTree_Init();
     ZipPassword_Init(container.top(),"");
-    openfile.close();
 
     QFile savefile(path+".huffmanzip");
     savefile.open(QIODevice::WriteOnly);
     QDataStream out(&savefile);
+    out<<(int)0;
     out<<(weightmap.size()==256 ? 0 : weightmap.size());
     for(QMap<QChar,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
         out<<it.key()<<it.value();
 
-    openfile.open(QIODevice::ReadOnly);
+    openfile.seek(0);
     QByteArray a;
     char ch = 0;
     int num = 0;
@@ -137,7 +137,12 @@ void Compression::Zip(QString path)
             }
         }
     }
-    if(num) out<<ch;
+    if(num)
+    {
+        out<<ch;
+        savefile.seek(0);
+        out<<num;
+    }
 
     openfile.close();
     savefile.close();
@@ -146,4 +151,42 @@ void Compression::Zip(QString path)
     container.pop();
     weightmap.clear();
     passwordmap.clear();
+}
+
+void Compression::UnZip(QString path)
+{
+    if(path.right(11)!=".huffmanzip")
+    {
+        QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件"));
+        return;
+    }
+    QFile openfile(path);
+    if(!openfile.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
+        return;
+    }
+
+    QDataStream in(&openfile);
+    int Num; in>>Num;
+    int n; in>>n; if(n==0) n=256;
+    for(int i = 1; i <= n; ++i)
+    {
+        QChar ch; in>>ch;
+        in>>weightmap[ch];
+    }
+    Container_Init();
+    HuffmanTree_Init();
+
+    while(!in.atEnd())
+    {
+        QChar CH; in>>CH;
+        char ch = CH.unicode();
+        int tot = 8;
+        if(in.atEnd()&&Num) tot = Num;
+        for(int i = 0; i < tot; ++i)
+        {
+            ;//遍历哈夫曼树，待完成
+        }
+    }
 }
