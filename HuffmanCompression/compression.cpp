@@ -88,7 +88,7 @@ void Compression::ZipPassword_Init(Node *x, QString s)
 {
     if(x!=NULL&&x->leaf)
     {
-        passwordmap[x->C] = StringToBits(s);
+        passwordmap[x->C] = s;
     }
     if(x->L!=NULL) ZipPassword_Init(x->L,s+'0');
     if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
