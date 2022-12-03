@@ -88,7 +88,7 @@ void Compression::ZipPassword_Init(Node *x, QString s)
 {
     if(x!=NULL&&x->leaf)
     {
-        passwordmap[x->C] = s;
+        passwordmap[x->C] = StringToBits(s);
     }
     if(x->L!=NULL) ZipPassword_Init(x->L,s+'0');
     if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
@@ -105,4 +105,27 @@ void Compression::Zip(QString path)
     Container_Init();
     HuffmanTree_Init();
     ZipPassword_Init(container.top(),"");
+    openfile.close();
+
+    QFile savefile(path+".huffmanzip");
+    savefile.open(QIODevice::WriteOnly);
+    QDataStream out(&savefile);
+    out<<(weightmap.size()==256 ? 0 : weightmap.size());
+    for(QMap<QChar,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+        out<<it.key()<<it.value();
+
+    openfile.open(QIODevice::ReadOnly);
+    QByteArray a;
+    while(!openfile.atEnd())
+    {
+        a = openfile.read(1024);
+        QString b = a;
+        for(int i = 0; i < b.size(); ++i)
+        out<<passwordmap[b[i]];
+    }
+
+    DEL(container.top());
+    container.pop();
+    weightmap.clear();
+    passwordmap.clear();
 }
