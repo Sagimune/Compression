@@ -116,13 +116,31 @@ void Compression::Zip(QString path)
 
     openfile.open(QIODevice::ReadOnly);
     QByteArray a;
+    char ch = 0;
+    int num = 0;
     while(!openfile.atEnd())
     {
         a = openfile.read(1024);
         QString b = a;
         for(int i = 0; i < b.size(); ++i)
-        out<<passwordmap[b[i]];
+        {
+            QString S = passwordmap[b[i]];
+            int Len = S.length();
+            for(int j = 0; j < Len; ++j)
+            {
+                if(S[j]=='1') ch |= (1<<num);
+                if((++num)==8)
+                {
+                    out<<ch;
+                    num = ch = 0;
+                }
+            }
+        }
     }
+    if(num) out<<ch;
+
+    openfile.close();
+    savefile.close();
 
     DEL(container.top());
     container.pop();
