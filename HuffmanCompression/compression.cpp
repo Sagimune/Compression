@@ -84,3 +84,25 @@ void Compression::HuffmanTree_Init()
         container.push(Hnode);
     }
 }
+void Compression::ZipPassword_Init(Node *x, QString s)
+{
+    if(x!=NULL&&x->leaf)
+    {
+        passwordmap[x->C] = s;
+    }
+    if(x->L!=NULL) ZipPassword_Init(x->L,s+'0');
+    if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
+}
+void Compression::Zip(QString path)
+{
+    QFile openfile(path);
+    if(!openfile.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::information(NULL,QString("Warming"),QString("Can't open this file"));
+        return;
+    }
+    Weightmap_Init(openfile);
+    Container_Init();
+    HuffmanTree_Init();
+    ZipPassword_Init(container.top(),"");
+}
