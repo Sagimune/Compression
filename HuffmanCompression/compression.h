@@ -28,7 +28,7 @@ class Compression : public QMainWindow
 private:
     QMap<QChar,int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<QChar,QString> passwordmap;
+    QMap<QChar,int> passwordmap;
 public:
     Compression();
     void Zip(QString path);
