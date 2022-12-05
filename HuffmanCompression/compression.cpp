@@ -20,8 +20,8 @@ void Compression::Weightmap_Init(QFile& in)
     while(!in.atEnd())
     {
         a = in.read(1024);
-        QString b = a;
-        for(int i = 0; i < b.size(); ++i)
+        std::string b = a.toStdString();
+        for(unsigned int i = 0; i < b.length(); ++i)
         {
             weightmap[b[i]]++;
         }
@@ -30,7 +30,7 @@ void Compression::Weightmap_Init(QFile& in)
 
 void Compression::Container_Init()
 {
-    for(QMap<QChar,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned char,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
         Node *Hnode = new Node;
         Hnode->C = it.key();
@@ -58,7 +58,7 @@ void Compression::HuffmanTree_Init()
     }
 }
 
-void Compression::ZipPassword_Init(Node *x, QString s)
+void Compression::ZipPassword_Init(Node *x, std::string s)
 {
     if(x!=NULL&&x->leaf)
     {
@@ -86,7 +86,7 @@ void Compression::Zip(QString path)
     QDataStream out(&savefile);
     out<<(int)0;
     out<<(weightmap.size()==256 ? 0 : weightmap.size());
-    for(QMap<QChar,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned char,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
         out<<it.key()<<it.value();
 
     openfile.seek(0);
@@ -96,10 +96,10 @@ void Compression::Zip(QString path)
     while(!openfile.atEnd())
     {
         a = openfile.read(1024);
-        QString b = a;
-        for(int i = 0; i < b.size(); ++i)
+        std::string b = a.toStdString();
+        for(unsigned int i = 0; i < b.length(); ++i)
         {
-            QString S = passwordmap[b[i]];
+            std::string S = passwordmap[b[i]];
             int Len = S.length();
             for(int j = 0; j < Len; ++j)
             {
@@ -147,7 +147,7 @@ void Compression::UnZip(QString path)
     int n; in>>n; if(n==0) n=256;
     for(int i = 1; i <= n; ++i)
     {
-        QChar ch; in>>ch;
+        unsigned char ch; in>>ch;
         in>>weightmap[ch];
     }
     Container_Init();
