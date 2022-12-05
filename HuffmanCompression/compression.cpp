@@ -32,8 +32,8 @@ void Compression::DEL(Node* x)
 {
     if(x==NULL) return;
     DEL(x->L),DEL(x->R);
-    x->L = x->R = NULL;
     delete x;
+    x = NULL;
 }
 
 void Compression::Weightmap_Init(QFile& in)
