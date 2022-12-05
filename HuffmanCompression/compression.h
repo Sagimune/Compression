@@ -7,10 +7,11 @@
 #include <QMap>
 #include <QFile>
 #include <queue>
+#include <string>
 
 struct Node
 {
-    QChar C;
+    unsigned char C;
     int weight;
     Node *L,*R;
     bool leaf;
@@ -26,9 +27,9 @@ struct CMP
 class Compression : public QMainWindow
 {
 private:
-    QMap<QChar,int> weightmap;
+    QMap<unsigned char,int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<QChar,QString> passwordmap;
+    QMap<unsigned char,std::string> passwordmap;
 public:
     Compression();
     void Zip(QString path);
@@ -38,7 +39,7 @@ protected:
     void Weightmap_Init(QFile& in);
     void Container_Init();
     void HuffmanTree_Init();
-    void ZipPassword_Init(Node *root, QString password);
+    void ZipPassword_Init(Node *root, std::string password);
 };
 
 #endif // COMPRESSION_H
