@@ -1,29 +1,6 @@
 #include "compression.h"
 #include <QDebug>
 
-int StringToBits(QString binarystring)
-{
-    int sum = 0, p = 1;
-    for(int i = 0; i < binarystring.size(); ++i)
-    {
-        if(binarystring[i] == '1')
-            sum |= p;
-        p <<= 1;
-    }
-    return sum;
-}
-
-QString BitsToString(int Bits)
-{
-    QString binarystring = "";
-    while(Bits)
-    {
-        binarystring += (Bits&1 ? '1' : '0');
-        Bits >>= 1;
-    }
-    while(binarystring.size()<8) binarystring += '0';
-    return binarystring;
-}
 Compression::Compression()
 {
 
