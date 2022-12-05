@@ -123,7 +123,7 @@ void Compression::Zip(QString path)
     openfile.close();
     savefile.close();
 
-    qDebug()<<"ZipTime: "<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+    qDebug()<<"ZipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
 
     DEL(container.top());
     container.pop();
@@ -181,7 +181,7 @@ void Compression::UnZip(QString path)
     openfile.close();
     savefile.close();
 
-    qDebug()<<"UnzipTime: "<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+    qDebug()<<"UnzipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
 
     DEL(container.top());
     container.pop();
