@@ -78,6 +78,11 @@ void Compression::Zip(QString path)
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
         return;
     }
+    if(openfile.size()==0)
+    {
+        QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
+        return;
+    }
     clock_t Begin = clock();
     Weightmap_Init(openfile);
     Container_Init();
@@ -144,6 +149,11 @@ void Compression::UnZip(QString path)
     if(!openfile.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败 "));
+        return;
+    }
+    if(openfile.size()==0)
+    {
+        QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
         return;
     }
 
