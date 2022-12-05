@@ -175,18 +175,33 @@ void Compression::UnZip(QString path)
         QChar ch; in>>ch;
         in>>weightmap[ch];
     }
+    openfile.close();
     Container_Init();
     HuffmanTree_Init();
 
+    path.chop(11);
+    path.insert(path.lastIndexOf('.'),"(NEW)");
+    QFile savefile(path);
+    savefile.open(QIODevice::WriteOnly);
+    Node *x = container.top();
     while(!in.atEnd())
     {
         QChar CH; in>>CH;
-        char ch = CH.unicode();
+        char ch = CH.toLatin1();
         int tot = 8;
         if(in.atEnd()&&Num) tot = Num;
         for(int i = 0; i < tot; ++i)
         {
-            ;//遍历哈夫曼树，待完成
+            x =(ch>>i)&1 ? x->L : x->R;
+            if(x->leaf)
+            {
+                savefile.write(reinterpret_cast<char*>(x->C.toLatin1()),1);
+                x = container.top();
+            }
         }
     }
+    savefile.close();
+    DEL(container.top());
+    container.pop();
+    weightmap.clear();
 }
