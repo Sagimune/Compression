@@ -50,22 +50,16 @@ void Compression::Weightmap_Init(QFile& in)
     }
 }
 
-Node* Compression::MakeNewNode(QChar ch)
-{
-    Node *Hnode = new Node;
-    Hnode->C = ch;
-    Hnode->weight = weightmap[ch];
-    Hnode->L = Hnode->R = NULL;
-    Hnode->leaf = 1;
-    return Hnode;
-}
-
 void Compression::Container_Init()
 {
     for(QMap<QChar,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
-        Node *NewNode = MakeNewNode(it.key());
-        container.push(NewNode);
+        Node *Hnode = new Node;
+        Hnode->C = it.key();
+        Hnode->weight = weightmap[it.key()];
+        Hnode->L = Hnode->R = NULL;
+        Hnode->leaf = 1;
+        container.push(Hnode);
     }
 }
 
@@ -117,7 +111,7 @@ void Compression::Zip(QString path)
 
     openfile.seek(0);
     QByteArray a;
-    char ch = 0;
+    unsigned char ch = 0;
     int num = 0;
     while(!openfile.atEnd())
     {
@@ -188,7 +182,7 @@ void Compression::UnZip(QString path)
     while(!in.atEnd())
     {
         QChar CH; in>>CH;
-        char ch = CH.toLatin1();
+        unsigned char ch = CH.toLatin1();
         int tot = 8;
         if(in.atEnd()&&Num) tot = Num;
         for(int i = 0; i < tot; ++i)
