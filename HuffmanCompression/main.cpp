@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QTime>
 #include "ccrashstack.h"
+#include "compression.h"
 
 long __stdcall   callback(_EXCEPTION_POINTERS*   excp)
 {
@@ -44,6 +45,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    Compression TT;
+    TT.Zip("D:/tmp/qwq.txt");
+    Compression T;
+    T.UnZip("D:/tmp/qwq.txt.huffmanzip");
     w.show();
     return a.exec();
 }
