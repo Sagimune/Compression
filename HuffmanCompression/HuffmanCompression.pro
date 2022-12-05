@@ -21,6 +21,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    ccrashstack.h \
     compression.h \
     mainwindow.h
 
