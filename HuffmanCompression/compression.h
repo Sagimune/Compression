@@ -8,6 +8,7 @@
 #include <QFile>
 #include <queue>
 #include <string>
+#include <ctime>
 
 struct Node
 {
