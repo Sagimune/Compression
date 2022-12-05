@@ -36,7 +36,6 @@ public:
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
-    Node *MakeNewNode(QChar ch);
     void Container_Init();
     void HuffmanTree_Init();
     void ZipPassword_Init(Node *root, QString password);
