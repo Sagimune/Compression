@@ -76,6 +76,7 @@ void Compression::Zip(QString path)
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
         return;
     }
+    clock_t Begin = clock();
     Weightmap_Init(openfile);
     Container_Init();
     HuffmanTree_Init();
@@ -122,6 +123,8 @@ void Compression::Zip(QString path)
     openfile.close();
     savefile.close();
 
+    qDebug()<<"ZipTime: "<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+
     DEL(container.top());
     container.pop();
     weightmap.clear();
@@ -142,6 +145,7 @@ void Compression::UnZip(QString path)
         return;
     }
 
+    clock_t Begin = clock();
     QDataStream in(&openfile);
     int Num; in>>Num;
     int n; in>>n; if(n==0) n=256;
@@ -176,6 +180,9 @@ void Compression::UnZip(QString path)
     }
     openfile.close();
     savefile.close();
+
+    qDebug()<<"UnzipTime: "<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+
     DEL(container.top());
     container.pop();
     weightmap.clear();
