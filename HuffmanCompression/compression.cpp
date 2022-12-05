@@ -168,12 +168,10 @@ void Compression::UnZip(QString path)
     QDataStream in(&openfile);
     int Num; in>>Num;
     int n; in>>n; if(n==0) n=256;
-    qDebug()<<Num<<" "<<n;
     for(int i = 1; i <= n; ++i)
     {
         QChar ch; in>>ch;
         in>>weightmap[ch];
-        qDebug()<<ch<<" "<<weightmap[ch];
     }
     Container_Init();
     HuffmanTree_Init();
@@ -182,19 +180,19 @@ void Compression::UnZip(QString path)
     path.insert(path.lastIndexOf('.'),"(NEW)");
     QFile savefile(path);
     savefile.open(QIODevice::WriteOnly);
+    QDataStream out(&savefile);
     Node *x = container.top();
     while(!in.atEnd())
     {
-        QChar CH; in>>CH;
-        unsigned char ch = CH.toLatin1();
+        unsigned char ch; in>>ch;
         int tot = 8;
         if(in.atEnd()&&Num) tot = Num;
         for(int i = 0; i < tot; ++i)
         {
-            x =(ch>>i)&1 ? x->L : x->R;
+            x =((ch>>i)&1) ? x->R : x->L;
             if(x->leaf)
             {
-                savefile.write(reinterpret_cast<char*>(x->C.toLatin1()),1);
+                out<<x->C;
                 x = container.top();
             }
         }
