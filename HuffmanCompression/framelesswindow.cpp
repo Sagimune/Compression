@@ -22,11 +22,11 @@ struct FramelessWindowPrivate {
 FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWidget(parent) {
     setWindowFlags(Qt::FramelessWindowHint);    // 去掉边框
     setAttribute(Qt::WA_TranslucentBackground); // 背景透明
-    QPushButton *addButton = new QPushButton(" 添加 ");
-    QPushButton *yasuoButton = new QPushButton(" 压缩 ");
-    QPushButton *jieyaButton = new QPushButton(" 解压 ");
-    QVBoxLayout *layout = new QVBoxLayout();
-    QTextEdit *text = new QTextEdit();
+    addButton = new QPushButton(" 添加 ");
+    yasuoButton = new QPushButton(" 压缩 ");
+    jieyaButton = new QPushButton(" 解压 ");
+    layout = new QVBoxLayout();
+    text = new QTextEdit();
     layout->addWidget(text);
     layout->addWidget(addButton);
     layout->addWidget(yasuoButton);
@@ -46,14 +46,14 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     d = new FramelessWindowPrivate(contentWidget);
 
     // 添加阴影
-    QGraphicsDropShadowEffect *shadowEffect = new QGraphicsDropShadowEffect(contentWidget);
+    shadowEffect = new QGraphicsDropShadowEffect(contentWidget);
     shadowEffect->setColor(Qt::lightGray);
     shadowEffect->setBlurRadius(4); // 阴影的大小
     shadowEffect->setOffset(0, 0);
     contentWidget->setGraphicsEffect(shadowEffect);
 
     // 添加到窗口中
-    QGridLayout *lo = new QGridLayout();
+    lo = new QGridLayout();
     lo->addWidget(contentWidget, 0, 0);
     lo->setContentsMargins(4, 4, 4, 4); // 注意和阴影大小的协调
     setLayout(lo);
