@@ -1,6 +1,8 @@
 #include "compression.h"
 #include <QDebug>
 
+unsigned long long INTMAX = 4294967295ull;
+
 Compression::Compression()
 {
 
@@ -30,7 +32,7 @@ void Compression::Weightmap_Init(QFile& in)
 
 void Compression::Container_Init()
 {
-    for(QMap<unsigned char,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
         Node *Hnode = new Node;
         Hnode->C = it.key();
@@ -52,7 +54,7 @@ void Compression::HuffmanTree_Init()
         Hnode->leaf = 0;
         Hnode->C = 0;
         Hnode->L = A, Hnode->R = B;
-        Hnode->weight = A->weight + B->weight;
+        Hnode->weight = (unsigned long long)A->weight + (unsigned long long)B->weight > INTMAX ? INTMAX : A->weight+B->weight;
 
         container.push(Hnode);
     }
@@ -87,7 +89,7 @@ void Compression::Zip(QString path)
     QDataStream out(&savefile);
     out<<(int)0;
     out<<(weightmap.size()==256 ? 0 : weightmap.size());
-    for(QMap<unsigned char,int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
         out<<it.key()<<it.value();
 
     openfile.seek(0);
