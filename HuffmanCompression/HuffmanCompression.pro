@@ -17,17 +17,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     compression.cpp \
+    framelesswindow.cpp \
     main.cpp \
-    mainwindow.cpp \
     test.cpp
 
 HEADERS += \
     compression.h \
-    mainwindow.h \
+    framelesswindow.h \
     test.h
 
 FORMS += \
-    mainwindow.ui
+    framelesswindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
