@@ -1,4 +1,5 @@
 #include "compression.h"
+#include <QDebug>
 
 int StringToBits(QString binarystring)
 {
@@ -79,6 +80,7 @@ void Compression::HuffmanTree_Init()
         container.push(Hnode);
     }
 }
+
 void Compression::ZipPassword_Init(Node *x, QString s)
 {
     if(x!=NULL&&x->leaf)
@@ -88,6 +90,7 @@ void Compression::ZipPassword_Init(Node *x, QString s)
     if(x->L!=NULL) ZipPassword_Init(x->L,s+'0');
     if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
 }
+
 void Compression::Zip(QString path)
 {
     QFile openfile(path);
@@ -165,12 +168,13 @@ void Compression::UnZip(QString path)
     QDataStream in(&openfile);
     int Num; in>>Num;
     int n; in>>n; if(n==0) n=256;
+    qDebug()<<Num<<" "<<n;
     for(int i = 1; i <= n; ++i)
     {
         QChar ch; in>>ch;
         in>>weightmap[ch];
+        qDebug()<<ch<<" "<<weightmap[ch];
     }
-    openfile.close();
     Container_Init();
     HuffmanTree_Init();
 
@@ -195,6 +199,7 @@ void Compression::UnZip(QString path)
             }
         }
     }
+    openfile.close();
     savefile.close();
     DEL(container.top());
     container.pop();
