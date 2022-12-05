@@ -132,13 +132,13 @@ void Compression::UnZip(QString path)
 {
     if(path.right(11)!=".huffmanzip")
     {
-        QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件"));
+        QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件 "));
         return;
     }
     QFile openfile(path);
     if(!openfile.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
+        QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败 "));
         return;
     }
 

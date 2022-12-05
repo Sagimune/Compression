@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     compression.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    test.cpp
 
 HEADERS += \
     compression.h \
-    mainwindow.h
+    mainwindow.h \
+    test.h
 
 FORMS += \
     mainwindow.ui
