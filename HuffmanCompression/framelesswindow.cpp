@@ -1,5 +1,11 @@
 #include "framelesswindow.h"
-
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include<QFileDialog>
+#include<QFile>
 #include <QMouseEvent>
 #include <QGridLayout>
 #include <QGraphicsDropShadowEffect>
@@ -10,11 +16,32 @@ struct FramelessWindowPrivate {
     QWidget *contentWidget;
     QPoint mousePressedPosition; // 鼠标按下时的坐标
     QPoint windowPositionAsDrag; // 鼠标按小时窗口左上角的坐标
+
 };
 
 FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWidget(parent) {
     setWindowFlags(Qt::FramelessWindowHint);    // 去掉边框
     setAttribute(Qt::WA_TranslucentBackground); // 背景透明
+    QPushButton *addButton = new QPushButton(" 添加 ");
+    QPushButton *yasuoButton = new QPushButton(" 压缩 ");
+    QPushButton *jieyaButton = new QPushButton(" 解压 ");
+    QVBoxLayout *layout = new QVBoxLayout();
+    QTextEdit *text = new QTextEdit();
+    layout->addWidget(text);
+    layout->addWidget(addButton);
+    layout->addWidget(yasuoButton);
+    layout->addWidget(jieyaButton);
+    //QWidget *contentWidget = new QWidget();
+    contentWidget->setLayout(layout);
+    contentWidget->setObjectName("contentWidget");
+    contentWidget->setStyleSheet("#contentWidget{background: lightgray; border-radius: 4px;}" // 定制圆角
+                                 ".QLabel{background: gray;}.QTextEdit{background: white;}");
+    // 创建无边框、有阴影、可拖动的窗口
+    QObject::connect(addButton, &QPushButton::clicked, [&] {
+        QString fileName = QFileDialog::getOpenFileName(this,QFileDialog::tr(" 选择文件 "), "");
+        text->setText(fileName);
+    });
+
 
     d = new FramelessWindowPrivate(contentWidget);
 
