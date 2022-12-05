@@ -19,7 +19,7 @@ struct CMP
 {
     bool operator() (Node* A,Node *B)
     {
-        return A->weight > B->weight;
+        return A->weight==B->weight ? A->C > B->C : A->weight > B->weight;
     }
 };
 
