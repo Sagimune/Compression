@@ -24,7 +24,6 @@ void Compression::Weightmap_Init(QFile& in)
         for(unsigned int i = 0; i < b.length(); ++i)
         {
             weightmap[b[i]]++;
-            qDebug()<<b[i];
         }
     }
 }
