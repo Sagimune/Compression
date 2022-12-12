@@ -25,7 +25,7 @@ LZSS::LZSS(BYTE* _stream, int len)
 
 bool LZSS::read(int len)
 {
-    for(int i = 0; i < std::min(len, reslen); i ++)
+    for(int i = 0; i < min(len, reslen); i ++)
     {
         if(buffercount < MAXLZBUFFER)
         {
@@ -88,7 +88,7 @@ bool LZSS::find()
     {
         if(slideWindow[i] == buffer[bufferleft])
         {
-            for(int offset = 0; offset < std::min(buffercount, swcount); offset ++)
+            for(int offset = 0; offset < min(buffercount, swcount); offset ++)
             {
                 if(slideWindow[(i + offset) % MAXLZSW] == buffer[(bufferleft + offset) % MAXLZBUFFER])
                 {

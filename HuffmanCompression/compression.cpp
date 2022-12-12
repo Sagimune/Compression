@@ -64,7 +64,7 @@ void Compression::ZipPassword_Get(Node *x, unsigned int len)
 {
     if(x!=NULL&&x->leaf)
     {
-        Q.push_back((ComparisonNode){0,len,x->C});
+        //Q.push_back((ComparisonNode){0,len,x->C});
         return;
     }
     if(x->L!=NULL) ZipPassword_Get(x->L,len+1);

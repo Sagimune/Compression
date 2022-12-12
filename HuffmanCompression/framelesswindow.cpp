@@ -9,7 +9,8 @@
 #include <QMouseEvent>
 #include <QGridLayout>
 #include <QGraphicsDropShadowEffect>
-
+#include<qscreen.h>
+#include"mypushbutton.h"
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -26,21 +27,58 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     yasuoButton = new QPushButton(" 压缩 ");
     jieyaButton = new QPushButton(" 解压 ");
     layout = new QVBoxLayout();
-    text = new QTextEdit();
-    layout->addWidget(text);
-    layout->addWidget(addButton);
-    layout->addWidget(yasuoButton);
-    layout->addWidget(jieyaButton);
-    //QWidget *contentWidget = new QWidget();
+    text = new QTextEdit(contentWidget);
+    text->setGeometry(5,30,1180,300);
+    text->show();
+    text->setStyleSheet("QTextEdit{border-radius:9px;}");
+
+    mypushbutton *exit = new mypushbutton(":/new/prefix1/Resoures/close.png");
+    exit->setGeometry(1160,0,25,25);
+    exit->setParent(contentWidget);
+    connect(exit,&QPushButton::clicked,[=]()
+    {
+        this->close();
+        contentWidget->close();
+    });
+    exit->show();
+
+    mypushbutton *zuidahua = new mypushbutton(":/new/prefix1/Resoures/bigger.png");
+    zuidahua->setGeometry(1135,0,25,25);
+    zuidahua->setParent(contentWidget);
+
+    zuidahua->show();
+
+    mypushbutton *newfile = new mypushbutton(":/new/prefix1/Resoures/newfile.png");
+    newfile->setGeometry(250,350,25,30);
+    newfile->setParent(contentWidget);
+
+    newfile->show();
+
+    mypushbutton *openfile = new mypushbutton(":/new/prefix1/Resoures/openfile.jpg");
+    openfile->setGeometry(700,350,25,30);
+    openfile->setParent(contentWidget);
+
+    openfile->show();
+
+    mypushbutton *zuixiaohua = new mypushbutton(":/new/prefix1/Resoures/hide.png");
+    zuixiaohua->setGeometry(1110,0,25,25);
+    zuixiaohua->setParent(contentWidget);
+    zuixiaohua->show();
+
+    mypushbutton *check = new mypushbutton(":/new/prefix1/Resoures/check.png");
+    check->setGeometry(475,350,25,30);
+    check->setParent(contentWidget);
+
     contentWidget->setLayout(layout);
     contentWidget->setObjectName("contentWidget");
-    contentWidget->setStyleSheet("#contentWidget{background: lightgray; border-radius: 4px;}" // 定制圆角
-                                 ".QLabel{background: gray;}.QTextEdit{background: white;}");
+    contentWidget->setStyleSheet("#contentWidget{background: lightblue; border-radius: 4px;}" // 定制圆角
+                                 ".QLabel{background: blue;}.QTextEdit{background: white;}");
+
+
+
     // 创建无边框、有阴影、可拖动的窗口
     QObject::connect(addButton, &QPushButton::clicked, [&] {
         QString fileName = QFileDialog::getOpenFileName(this,QFileDialog::tr(" 选择文件 "), "");
-        Compression C;
-        C.Zip(fileName);
         text->setText(fileName);
     });
 
@@ -59,6 +97,10 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     lo->addWidget(contentWidget, 0, 0);
     lo->setContentsMargins(4, 4, 4, 4); // 注意和阴影大小的协调
     setLayout(lo);
+
+
+    //this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint| Qt::WindowMinimizeButtonHint);//清除所有|使用关闭|使用最小化
+
 }
 
 FramelessWindow::~FramelessWindow() {

@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>Resoures/bigger.png</file>
+        <file>Resoures/check.png</file>
+        <file>Resoures/close.png</file>
+        <file>Resoures/exit.png</file>
+        <file>Resoures/exit1.png</file>
+        <file>Resoures/hide.png</file>
+        <file>Resoures/littler.png</file>
+        <file>Resoures/newfile.png</file>
+        <file>Resoures/openfile.jpg</file>
+        <file>Resoures/zuidahua.png</file>
+    </qresource>
+</RCC>

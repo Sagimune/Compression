@@ -20,6 +20,7 @@ SOURCES += \
     framelesswindow.cpp \
     lzss.cpp \
     main.cpp \
+    mypushbutton.cpp \
     test.cpp \
     zipcompression.cpp \
     zipformat.cpp
@@ -28,6 +29,7 @@ HEADERS += \
     compression.h \
     framelesswindow.h \
     lzss.h \
+    mypushbutton.h \
     stdatx.h \
     test.h \
     zipcompression.h \
@@ -40,3 +42,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    Resoures.qrc
