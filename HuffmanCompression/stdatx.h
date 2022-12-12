@@ -5,6 +5,7 @@
 #include<string.h>
 #include<qDebug>
 #include<stdio.h>
+#include<stdlib.h>
 
 #define MAXLZBUFFER     9
 #define MAXLZSW         32768

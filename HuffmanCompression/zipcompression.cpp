@@ -5,40 +5,130 @@ zipcompression::zipcompression()
 
 }
 
-void zipcompression::nocompression(char* infilepath, char* infilename, char* outfile)
+bool zipcompression::ListDirectoryContents(const char *sDir, int len)
 {
-    FILE* file = fopen(infilepath, "rb");
-    FILE* output = fopen(outfile, "wb");
-    char data[1024];
-    fgets(data, 1024, file);
+    WIN32_FIND_DATAA fdFile;
+    HANDLE hFind = NULL;
 
-    int lfsize = 0;
-    int cdsize = 0;
+    char sPath[2048];
 
+    sprintf(sPath, "%s\\*.*", sDir);
+
+    if((hFind = FindFirstFileA(sPath, &fdFile)) == INVALID_HANDLE_VALUE)
+    {
+        printf("Path not found: [%s]\n", sDir);
+        return false;
+    }
+
+    do
+    {
+        if(strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0)
+        {
+            sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+
+            if(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY)
+            {
+                //printf("%s\\\n", sPath + len);
+                sprintf(filename[filecount ++], "<%s\\", sPath + len);
+                ListDirectoryContents(sPath, len);
+            }
+            else{
+                //printf("%s\n", sPath + len);
+                sprintf(filename[filecount ++], ">%s", sPath + len);
+            }
+        }
+    }
+
+    while(FindNextFileA(hFind, &fdFile));
+
+    FindClose(hFind);
+
+    return true;
+}
+
+
+
+
+DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &inlen)
+{
     //localFile
     struct localFile lf1;
-    lf1.crc_32 = crc32(0, data, strlen(data));
-    lf1.compressed_size = strlen(data);
-    lf1.uncompressed_size = strlen(data);
+    DWORD lfsize = 0;
+    int outlen = 0;
+    int isdir = 0;
+    BYTE* out;
+
+    if(infilename[strlen(infilename) - 1] == '\\')
+    {
+        isdir = 1;
+        crc_32 = 0x0000;
+        inlen = 0x0000;
+        outlen = 0x0000;
+    }
+    else
+    {
+
+        BYTE data[BLOCKSIZE];
+        FILE* file = fopen(infilepath, "rb");
+
+        //motify inlen & data
+        inlen = fread(&data, sizeof(BYTE), BLOCKSIZE, file);
+        fclose(file);
+
+        //motify outlen & data
+        out = doCompress(data, inlen, outlen, 0);
+
+        crc_32 = crc32(0, (char*)data, inlen);
+        lf1.crc_32 = crc_32;
+    }
+
+    lf1.compressed_size = outlen;
+    lf1.uncompressed_size = inlen;
     lf1.file_name_length = strlen(infilename);
 
-    qDebug() << lf1.crc_32;
-    qDebug() << sizeof(lf1);
+    //qDebug() << lf1.crc_32;
+    //qDebug() << sizeof(lf1);
 
+    //输出文件头
     fwrite(&lf1, sizeof(lf1), 1, output);
+
+    //输出文件名
     fputs(infilename, output);
-    fwrite(data, sizeof(char), strlen(data), output);
+
+    //输出压缩数据
+    if(!isdir) fwrite(out, sizeof(BYTE), outlen, output);
 
     lfsize += sizeof(lf1);
     lfsize += strlen(infilename);
-    lfsize += strlen(data);
+    lfsize += inlen;
 
+    return lfsize;
+}
+
+BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int method)
+{
+    if(method == 8)
+    {
+
+    }
+    else
+    {
+        outlen = inlen;
+        return stream;
+    }
+    return NULL;
+}
+
+DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset)
+{
     //centralDirectoryHeader
+    DWORD cdsize = 0;
     struct centralDirectoryHeader cdh1;
-    cdh1.crc_32 = crc32(0, data, strlen(data));
-    cdh1.compressed_size = strlen(data);
-    cdh1.uncompressed_size = strlen(data);
+    cdh1.crc_32 = crc_32;
+    cdh1.compressed_size = datalen;
+    cdh1.uncompressed_size = datalen;
     cdh1.file_name_length = strlen(infilename);
+    cdh1.relative_offset_of_local_header = offset;
 
     fwrite(&cdh1, sizeof(cdh1), 1, output);
     fputs(infilename, output);
@@ -53,13 +143,50 @@ void zipcompression::nocompression(char* infilepath, char* infilename, char* out
     cdsize += strlen(infilename);
     cdsize += sizeof(time);
 
+    return cdsize;
+}
+
+void zipcompression::nocompression(char* dir, char* outfile)
+{
+    filecount = 0;
+    ListDirectoryContents(dir, strlen(dir));
+
+    FILE* output = fopen(outfile, "wb");
+    FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
+    DWORD lfsize, cdsize, crc_32, offset;
+    int datalen;
+
+    offset = 0;
+    for(int i = 0; i < filecount; i ++ )
+    {
+        char filepath[1024];
+        sprintf(filepath, "%s%s", dir, filename[i] + 2);
+        qDebug() << "path:" << filepath;
+        qDebug() << "name:" << filename[i] + 2;
+        lfsize += pack_onefileheader(filepath, filename[i] + 2, 0, output, crc_32, datalen);
+        cdsize += pack_onecdheader(filepath, filename[i] + 2, 0, tmpcdfile, datalen, crc_32, offset);
+        offset = lfsize;
+    }
+
+    fclose(tmpcdfile);
+    tmpcdfile = fopen("tmp.tmp", "r");
+
+    while(!feof(tmpcdfile))
+    {
+        char ch = fgetc(tmpcdfile);
+        if(ch == EOF) break;
+        fprintf(output, "%c", ch);
+    }
+    remove("tmp.tmp");
+
     //ECDrecord
     struct ECDrecord footer;
+    footer.total_number_of_entries_in_cd_on_this_disk = filecount;
+    footer.total_number_of_entries_in_cd = filecount;
     footer.size_of_the_central_directory = cdsize;
     footer.offset_of_cd_start_with_respect_to_the_starting_disk_number = lfsize;
     fwrite(&footer, sizeof(footer), 1, output);
 
-    fclose(file);
     fclose(output);
 }
 
