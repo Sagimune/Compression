@@ -44,12 +44,9 @@ bool test::testLZSS()
 bool test::testNoCompression()
 {
     zipcompression *test = new zipcompression;
-    char infilepath[] = "D:\\git\\test\\test1.txt";
-    char infilename[] = "test1.txt";
     char outfile[] = "D:\\git\\test\\test1215.zip";
     //char dir[] = "D:\\git\\test\\mul\\";
     char dir[] = "D:\\git\\test\\include\\";
     test->nocompression(dir, outfile);
-    //test->ListDirectoryContents("D:\\git\\test", strlen("D:\\git\\test\\"));
     return true;
 }

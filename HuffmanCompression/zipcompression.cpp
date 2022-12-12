@@ -29,12 +29,12 @@ bool zipcompression::ListDirectoryContents(const char *sDir, int len)
             if(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY)
             {
                 //printf("%s\\\n", sPath + len);
-                sprintf(filename[filecount ++], "<%s\\", sPath + len);
+                sprintf(filename[filecount ++], "%s\\", sPath + len);
                 ListDirectoryContents(sPath, len);
             }
             else{
                 //printf("%s\n", sPath + len);
-                sprintf(filename[filecount ++], ">%s", sPath + len);
+                sprintf(filename[filecount ++], "%s", sPath + len);
             }
         }
     }
@@ -160,11 +160,11 @@ void zipcompression::nocompression(char* dir, char* outfile)
     for(int i = 0; i < filecount; i ++ )
     {
         char filepath[1024];
-        sprintf(filepath, "%s%s", dir, filename[i] + 2);
+        sprintf(filepath, "%s%s", dir, filename[i] + 1);
         qDebug() << "path:" << filepath;
-        qDebug() << "name:" << filename[i] + 2;
-        lfsize += pack_onefileheader(filepath, filename[i] + 2, 0, output, crc_32, datalen);
-        cdsize += pack_onecdheader(filepath, filename[i] + 2, 0, tmpcdfile, datalen, crc_32, offset);
+        qDebug() << "name:" << filename[i] + 1;
+        lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, datalen);
+        cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, datalen, crc_32, offset);
         offset = lfsize;
     }
 
@@ -201,7 +201,7 @@ QWORD zipcompression::gettime()
     ret |= file_t.dwLowDateTime;
 
     //qDebug() << file_t.dwHighDateTime << " " << file_t.dwLowDateTime;
-    qDebug() << ret;
+    //qDebug() << ret;
 
     return ret;
 }
