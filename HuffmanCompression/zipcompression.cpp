@@ -185,14 +185,14 @@ void zipcompression::nocompression(char* dir, char* outfile)
     remove("tmp.tmp");
 
     //ECDrecord
-   /* struct ECDrecord footer;
+    struct ECDrecord footer;
     footer.total_number_of_entries_in_cd_on_this_disk = filecount;
     footer.total_number_of_entries_in_cd = filecount;
     footer.size_of_the_central_directory = cdsize;
     footer.offset_of_cd_start_with_respect_to_the_starting_disk_number = lfsize;
     fwrite(&footer, sizeof(footer), 1, output);
 
-    fclose(output);*/
+    fclose(output);
 }
 
 QWORD zipcompression::gettime()
