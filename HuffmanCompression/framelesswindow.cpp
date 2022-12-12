@@ -39,6 +39,8 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     // 创建无边框、有阴影、可拖动的窗口
     QObject::connect(addButton, &QPushButton::clicked, [&] {
         QString fileName = QFileDialog::getOpenFileName(this,QFileDialog::tr(" 选择文件 "), "");
+        Compression C;
+        C.Zip(fileName);
         text->setText(fileName);
     });
 

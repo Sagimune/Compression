@@ -18,13 +18,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     compression.cpp \
     framelesswindow.cpp \
+    lzss.cpp \
     main.cpp \
-    test.cpp
+    test.cpp \
+    zipcompression.cpp \
+    zipformat.cpp
 
 HEADERS += \
     compression.h \
     framelesswindow.h \
-    test.h
+    lzss.h \
+    stdatx.h \
+    test.h \
+    zipcompression.h \
+    zipformat.h
 
 FORMS += \
     framelesswindow.ui

@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QGraphicsDropShadowEffect>
+#include "compression.h"
 
 struct FramelessWindowPrivate;
 
