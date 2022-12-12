@@ -60,16 +60,31 @@ void Compression::HuffmanTree_Init()
     }
 }
 
-void Compression::ZipPassword_Init(Node *x, std::string s)
+void Compression::ZipPassword_Get(Node *x, unsigned int len)
 {
     if(x!=NULL&&x->leaf)
     {
-        passwordmap[x->C] = s;
+        Q.push_back((ComparisonNode){0,len,x->C});
+        return;
     }
-    if(x->L!=NULL) ZipPassword_Init(x->L,s+'0');
-    if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
+    if(x->L!=NULL) ZipPassword_Get(x->L,len+1);
+    if(x->R!=NULL) ZipPassword_Get(x->R,len+1);
+}
+void Compression::ZipPassword_Init(bool type)
+{
+    if(type==0)
+    {
+        ZipPassword_Get(container.top(),1);
+        std::sort(Q.begin(),Q.end(),Comcmp());
+    }
+    Q[0].Code = 0;
+    if(Q.size()<2) return;
+    int QSIZE = Q.size();
+    for(int i = 1; i < QSIZE; ++i)
+        Q[i].Code = (Q[i-1].Code+1)<<(Q[i].Len-Q[i-1].Len);
 }
 
+//Zip和Unzip目前不可用
 void Compression::Zip(QString path)
 {
     QFile openfile(path);
@@ -87,7 +102,7 @@ void Compression::Zip(QString path)
     Weightmap_Init(openfile);
     Container_Init();
     HuffmanTree_Init();
-    ZipPassword_Init(container.top(),"");
+    ZipPassword_Init(0);
 
     QFile savefile(path+".huffmanzip");
     savefile.open(QIODevice::WriteOnly);
