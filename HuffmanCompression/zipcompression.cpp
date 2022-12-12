@@ -1,5 +1,8 @@
 #include "zipcompression.h"
 
+int gfilecount;
+struct drawData drawdata[1024];
+
 zipcompression::zipcompression()
 {
 
@@ -163,10 +166,12 @@ void zipcompression::nocompression(char* dir, char* outfile)
         sprintf(filepath, "%s%s", dir, filename[i] + 1);
         qDebug() << "path:" << filepath;
         qDebug() << "name:" << filename[i] + 1;
+        sprintf(drawdata[i].filename, "%s", filename[i] + 1);
         lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, datalen);
         cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, datalen, crc_32, offset);
         offset = lfsize;
     }
+    gfilecount = filecount;
 
     fclose(tmpcdfile);
     tmpcdfile = fopen("tmp.tmp", "r");

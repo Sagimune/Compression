@@ -4,6 +4,12 @@
 #include "stdatx.h"
 #include "zipformat.h"
 
+struct drawData
+{
+    char filename[255];
+};
+
+
 class zipcompression
 {
 public:

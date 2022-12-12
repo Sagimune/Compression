@@ -12,5 +12,4 @@
 #define MINLZLEN        3
 #define BLOCKSIZE       16383
 
-
 #endif // STDATX_H

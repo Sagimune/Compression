@@ -1,5 +1,8 @@
 #include "test.h"
 
+extern int gfilecount;
+extern struct drawData drawdata[1024];
+
 test::test()
 {
     bool flag = true;
@@ -48,5 +51,11 @@ bool test::testNoCompression()
     //char dir[] = "D:\\git\\test\\mul\\";
     char dir[] = "D:\\git\\test\\include\\";
     test->nocompression(dir, outfile);
+
+    for(int i = 0; i < gfilecount; i ++ )
+    {
+        qDebug() << i << ": "<< drawdata[i].filename;
+    }
+
     return true;
 }
