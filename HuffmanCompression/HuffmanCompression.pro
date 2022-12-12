@@ -1,5 +1,5 @@
 QT       += core gui
-
+QT    +=winextras
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     mypushbutton.cpp \
     test.cpp \
+    viewfiles.cpp \
     zipcompression.cpp \
     zipformat.cpp
 
@@ -32,11 +33,13 @@ HEADERS += \
     mypushbutton.h \
     stdatx.h \
     test.h \
+    viewfiles.h \
     zipcompression.h \
     zipformat.h
 
 FORMS += \
-    framelesswindow.ui
+    framelesswindow.ui \
+    viewfiles.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -11,6 +11,7 @@
 #include <QGraphicsDropShadowEffect>
 #include<qscreen.h>
 #include"mypushbutton.h"
+#include"viewfiles.h"
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -59,7 +60,11 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     openfile->setParent(contentWidget);
 
     openfile->show();
-
+    connect(openfile,&QPushButton::clicked,[=]()
+    {
+        viewfiles *view = new viewfiles;
+        view->show();
+    });
     mypushbutton *zuixiaohua = new mypushbutton(":/new/prefix1/Resoures/hide.png");
     zuixiaohua->setGeometry(1110,0,25,25);
     zuixiaohua->setParent(contentWidget);
