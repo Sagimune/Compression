@@ -50,12 +50,20 @@ bool test::testNoCompression()
     char outfile[] = "D:\\git\\test\\test1215.zip";
     //char dir[] = "D:\\git\\test\\mul\\";
     char dir[] = "D:\\git\\test\\include\\";
+
+    char dedir[] = "D:\\git\\test\\testde\\";
+    char defile[] = "D:\\git\\test\\test1215.zip";
+
     test->nocompression(dir, outfile);
+    test->viewzip(defile);
+    test->decompress(defile, dedir);
 
     for(int i = 0; i < gfilecount; i ++ )
     {
         qDebug() << i << ": "<< drawdata[i].filename;
     }
+
+
 
     return true;
 }

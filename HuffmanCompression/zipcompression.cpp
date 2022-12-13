@@ -85,6 +85,11 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
         lf1.crc_32 = crc_32;
     }
 
+    SYSTEMTIME sys_t;
+    GetSystemTime(&sys_t);
+    qDebug() << "time: " << sys_t.wHour+8 << ":" << sys_t.wMinute << ":" << sys_t.wSecond;
+    lf1.last_mod_file_date = (sys_t.wDay & daymask) | ((sys_t.wMonth << 5) & monthmask) | (sys_t.wYear-1980 << 9);
+    lf1.last_mod_file_time = (sys_t.wSecond / 2 & secondmask) | ((sys_t.wMinute << 5) & minutemask) | ((sys_t.wHour+8) << 11);
     lf1.compressed_size = outlen;
     lf1.uncompressed_size = inlen;
     lf1.file_name_length = strlen(infilename);
@@ -127,6 +132,11 @@ DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int m
     //centralDirectoryHeader
     DWORD cdsize = 0;
     struct centralDirectoryHeader cdh1;
+
+    SYSTEMTIME sys_t;
+    GetSystemTime(&sys_t);
+    cdh1.last_mod_file_date = (sys_t.wDay & daymask) | ((sys_t.wMonth << 5) & monthmask) | (sys_t.wYear-1980 << 9);
+    cdh1.last_mod_file_time = (sys_t.wSecond / 2 & secondmask) | ((sys_t.wMinute << 5) & minutemask) | ((sys_t.wHour+8) << 11);
     cdh1.crc_32 = crc_32;
     cdh1.compressed_size = datalen;
     cdh1.uncompressed_size = datalen;
@@ -164,9 +174,6 @@ void zipcompression::nocompression(char* dir, char* outfile)
     {
         char filepath[1024];
         sprintf(filepath, "%s%s", dir, filename[i] + 1);
-        qDebug() << "path:" << filepath;
-        qDebug() << "name:" << filename[i] + 1;
-        sprintf(drawdata[i].filename, "%s", filename[i] + 1);
         lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, datalen);
         cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, datalen, crc_32, offset);
         offset = lfsize;
@@ -193,6 +200,99 @@ void zipcompression::nocompression(char* dir, char* outfile)
     fwrite(&footer, sizeof(footer), 1, output);
 
     fclose(output);
+}
+
+BYTE* zipcompression::doDecompress(BYTE* stream, int inlen, int &outlen, int method)
+{
+    if(method == 8)
+    {
+
+    }
+    else
+    {
+        outlen = inlen;
+        return stream;
+    }
+    return NULL;
+}
+
+bool zipcompression::viewzip(char *zipfilename)
+{
+    memset(filename, 0, sizeof(filename));
+    FILE *zipfile = fopen(zipfilename, "rb");
+
+    //ECDrecord
+    BYTE tmp[sizeof(ECDrecord)];
+    fseek(zipfile, -sizeof(ECDrecord), SEEK_END);
+    fread(tmp, sizeof(ECDrecord), 1, zipfile);
+    struct ECDrecord *footer = (ECDrecord*)tmp;
+
+    filecount = footer->total_number_of_entries_in_cd;
+    cdoffset = footer->offset_of_cd_start_with_respect_to_the_starting_disk_number;
+
+    //cdHeader
+    fseek(zipfile, cdoffset, SEEK_SET);
+    for(int i = 0; i < filecount; i ++ )
+    {
+        BYTE tmp[sizeof(centralDirectoryHeader)];
+        fread(tmp, sizeof(centralDirectoryHeader), 1, zipfile);
+        struct centralDirectoryHeader *cdheader = (centralDirectoryHeader*)tmp;
+        WORD file_name_length = cdheader->file_name_length;
+        fread(filename[i], file_name_length, 1, zipfile);
+        fseek(zipfile, 0x0024, SEEK_CUR);
+
+        sprintf(drawdata[i].filename, "%s", filename[i]);
+        qDebug() << "viewzip: i: " << i <<  "filenamelength: " << file_name_length << "  filename: " << filename[i];
+    }
+
+    fclose(zipfile);
+
+    return true;
+}
+
+bool zipcompression::decompress(char *zipfilename, char* where)
+{
+    viewzip(zipfilename);
+
+    FILE *zipfile = fopen(zipfilename, "rb");
+    BYTE datatmp[BLOCKSIZE];
+
+
+    //localFile
+    fseek(zipfile, 0, SEEK_SET);
+    for(int i = 0; i < filecount; i ++ )
+    {
+        BYTE tmp[sizeof(localFile)];
+        fread(tmp, sizeof(localFile), 1, zipfile);
+
+        char onefilename[1024];
+        sprintf(onefilename, "%s%s", where, filename[i]);
+
+        struct localFile *fileheader = (localFile*)tmp;
+        DWORD datasize = fileheader->compressed_size;
+
+        fseek(zipfile, fileheader->file_name_length, SEEK_CUR);
+        if(datasize == 0)
+        {
+            //mkdir
+            CreateDirectoryA(onefilename, NULL);
+        }
+        else
+        {
+            fread(datatmp, sizeof(BYTE), datasize, zipfile);
+
+            int outlen;
+            BYTE *out = doDecompress(datatmp, datasize, outlen, 0);
+
+            FILE *outfile = fopen(onefilename, "wb");
+            fwrite(out, sizeof(BYTE), outlen, outfile);
+            fclose(outfile);
+        }
+    }
+
+    fclose(zipfile);
+
+    return true;
 }
 
 QWORD zipcompression::gettime()
