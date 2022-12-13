@@ -50,9 +50,6 @@ bool zipcompression::ListDirectoryContents(const char *sDir, int len)
     return true;
 }
 
-
-
-
 DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &inlen)
 {
     //localFile
@@ -114,20 +111,6 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
     return lfsize;
 }
 
-BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int method)
-{
-    if(method == 8)
-    {
-
-    }
-    else
-    {
-        outlen = inlen;
-        return stream;
-    }
-    return NULL;
-}
-
 DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset)
 {
     //centralDirectoryHeader
@@ -160,7 +143,21 @@ DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int m
     return cdsize;
 }
 
-void zipcompression::nocompression(char* dir, char* outfile)
+BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int method)
+{
+    if(method == 8)
+    {
+
+    }
+    else
+    {
+        outlen = inlen;
+        return stream;
+    }
+    return NULL;
+}
+
+void zipcompression::compression(char* dir, char* outfile, int method)
 {
     filecount = 0;
     ListDirectoryContents(dir, strlen(dir));
@@ -175,8 +172,8 @@ void zipcompression::nocompression(char* dir, char* outfile)
     {
         char filepath[1024];
         sprintf(filepath, "%s%s", dir, filename[i] + 1);
-        lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, datalen);
-        cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, datalen, crc_32, offset);
+        lfsize += pack_onefileheader(filepath, filename[i] + 1, method, output, crc_32, datalen);
+        cdsize += pack_onecdheader(filepath, filename[i] + 1, method, tmpcdfile, datalen, crc_32, offset);
         offset = lfsize;
     }
     gfilecount = filecount;
@@ -283,7 +280,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
             fread(datatmp, sizeof(BYTE), datasize, zipfile);
 
             int outlen;
-            BYTE *out = doDecompress(datatmp, datasize, outlen, 0);
+            BYTE *out = doDecompress(datatmp, datasize, outlen, fileheader->compression_method);
 
             FILE *outfile = fopen(onefilename, "wb");
             fwrite(out, sizeof(BYTE), outlen, outfile);

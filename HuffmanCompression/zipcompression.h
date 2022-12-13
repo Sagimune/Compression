@@ -30,7 +30,7 @@ public:
     BYTE* doCompress(BYTE* stream, int inlen, int &outlen, int method);
     DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &datalen);
     DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset);
-    void nocompression(char* dir, char* outfile);
+    void compression(char* dir, char* outfile, int method);
 
     BYTE* doDecompress(BYTE* stream, int inlen, int &outlen, int method);
     bool viewzip(char *zipfilename);

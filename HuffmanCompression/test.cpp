@@ -54,7 +54,7 @@ bool test::testNoCompression()
     char dedir[] = "D:\\git\\test\\testde\\";
     char defile[] = "D:\\git\\test\\test1215.zip";
 
-    test->nocompression(dir, outfile);
+    test->compression(dir, outfile, 0);
     test->viewzip(defile);
     test->decompress(defile, dedir);
 
