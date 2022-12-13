@@ -15,6 +15,7 @@ public:
     bool testQByteArray2QString();
     bool testLZSS();
     bool testNoCompression();
+    bool testCLCode();
 };
 
 #endif // TEST_H

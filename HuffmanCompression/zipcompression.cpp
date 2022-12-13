@@ -343,3 +343,65 @@ DWORD zipcompression::crc32(DWORD crc, const char *buf, int len)
     }
     return ~crc;
 }
+
+int* zipcompression::clcodeEncode(int *stream, int inlen, int& outlen)
+{
+    outlen = 0;
+    if(inlen < 3)
+    {
+        outlen = inlen;
+        return stream;
+    }
+    int count = 0;
+    stream[inlen] = 99;
+    inlen ++;
+    for(int i = 0; i < inlen - 1; i ++)
+    {
+        clcode_out[outlen ++] = stream[i];
+        if(stream[i] == stream[i+1] && (count + 1 <= 137))
+        {
+            count ++;
+        }
+        else
+        {   //count + 1; repeat
+            if(count + 1 >= 3)
+            {
+                if(stream[i] == 0 && count + 1 <= 10)
+                {
+                    outlen -= count + 1;
+                    clcode_out[outlen ++] = 17;
+                    clcode_out[outlen ++] = count+1 - 3;
+                }
+                else if(stream[i] == 0 && count + 1 >= 11)
+                {
+                    outlen -= count + 1;
+                    clcode_out[outlen ++] = 18;
+                    clcode_out[outlen ++] = count+1 - 11;
+                }
+                else if(count + 1 >= 4)
+                {
+                    outlen -= count + 1;
+                    clcode_out[outlen ++] = stream[i];
+                    while(count >= 6)
+                    {
+                        clcode_out[outlen ++] = 16;
+                        clcode_out[outlen ++] = 3;
+                        count -= 6;
+                    }
+                    if(count >= 3)
+                    {
+                        clcode_out[outlen ++] = 16;
+                        clcode_out[outlen ++] = count - 3;
+                    }
+                    else
+                    {
+                        for(int j = 0; j < count; j ++ ) clcode_out[outlen ++] = stream[i];
+                    }
+                }
+            }
+            count = 0;
+        }
+    }
+
+    return clcode_out;
+}

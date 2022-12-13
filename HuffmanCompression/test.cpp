@@ -7,8 +7,9 @@ test::test()
 {
     bool flag = true;
     flag |= testQByteArray2QString();
-    flag |= testLZSS();
+    //flag |= testLZSS();
     //flag |= testNoCompression();
+    flag |= testCLCode();
 
     if(flag)
         qDebug() << "测试通过 ";
@@ -63,6 +64,29 @@ bool test::testNoCompression()
         qDebug() << i << ": "<< drawdata[i].filename;
     }
 
+
+    return true;
+}
+
+bool test::testCLCode()
+{
+    zipcompression *test = new zipcompression;
+
+    int llcode[286];
+    memset(llcode, 0, sizeof(llcode));
+
+    llcode[32] = llcode[65] = 4;
+    for(int i = 66; i <= 69; i ++ ) llcode[i] = 3;
+    llcode[256] = llcode[258] = llcode[263] = 3;
+
+    int outlen = 0;
+    int *outstream = test->clcodeEncode(llcode, 285, outlen);
+    for(int i = 0; i < outlen; i ++ )
+    {
+        qDebug() << outstream[i];
+    }
+
+    qDebug() << "CLCodeEncode测试完毕";
 
     return true;
 }

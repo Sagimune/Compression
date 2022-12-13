@@ -3,6 +3,7 @@
 
 #include "stdatx.h"
 #include "zipformat.h"
+#include "lzss.h"
 
 struct drawData
 {
@@ -24,6 +25,8 @@ public:
 
     DWORD cdoffset;
 
+    int clcode_out[BLOCKSIZE*4];
+
     bool ListDirectoryContents(const char *sDir, int len);
     QWORD gettime();
     DWORD crc32(DWORD crc, const char *buf, int len);
@@ -35,6 +38,8 @@ public:
     BYTE* doDecompress(BYTE* stream, int inlen, int &outlen, int method);
     bool viewzip(char *zipfilename);
     bool decompress(char *zipfilename, char* where);
+
+    int* clcodeEncode(int *stream, int inlen, int& outlen);
 
 };
 
