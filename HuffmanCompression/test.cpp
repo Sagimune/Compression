@@ -8,7 +8,7 @@ test::test()
     bool flag = true;
     flag |= testQByteArray2QString();
     flag |= testLZSS();
-    flag |= testNoCompression();
+    //flag |= testNoCompression();
 
     if(flag)
         qDebug() << "测试通过 ";
@@ -62,7 +62,6 @@ bool test::testNoCompression()
     {
         qDebug() << i << ": "<< drawdata[i].filename;
     }
-
 
 
     return true;

@@ -5,7 +5,8 @@ struct drawData drawdata[1024];
 
 zipcompression::zipcompression()
 {
-
+    memset(drawdata, 0, sizeof(drawdata));
+    memset(filename, 0, sizeof(filename));
 }
 
 bool zipcompression::ListDirectoryContents(const char *sDir, int len)
