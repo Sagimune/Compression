@@ -101,7 +101,7 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     weightmap.clear();
     passwordmap.clear();
 
-    for(int i = 0; i < inlen; ++i)
+    for(int i = 1; i <= inlen; ++i)
     {
         weightmap[stream_after_lzss[i]]++;
     }
