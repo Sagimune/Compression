@@ -204,7 +204,12 @@ BYTE* zipcompression::doDecompress(BYTE* stream, int inlen, int &outlen, int met
 {
     if(method == 8)
     {
-
+        //比特归类法
+        int op;
+        /*
+            1： read 3bit ： CCL
+            2： read
+        */
     }
     else
     {
@@ -240,6 +245,9 @@ bool zipcompression::viewzip(char *zipfilename)
         fseek(zipfile, 0x0024, SEEK_CUR);
 
         sprintf(drawdata[i].filename, "%s", filename[i]);
+        drawdata[i].uncompress_size = cdheader->uncompressed_size;
+        drawdata[i].compress_size = cdheader->compressed_size;
+        drawdata[i].crc_32 = cdheader->crc_32;
         qDebug() << "viewzip: i: " << i <<  "filenamelength: " << file_name_length << "  filename: " << filename[i];
     }
 

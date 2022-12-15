@@ -4,10 +4,14 @@
 #include "stdatx.h"
 #include "zipformat.h"
 #include "lzss.h"
+#include <bitset>
 
 struct drawData
 {
     char filename[255];
+    int uncompress_size;
+    int compress_size;
+    int crc_32;
 };
 
 static WORD secondmask = 0x1f;
