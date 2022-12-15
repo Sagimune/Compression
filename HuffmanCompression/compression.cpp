@@ -110,14 +110,11 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     ZipPassword_Init(0);
 
     huffman_result* Ans = new huffman_result;
-    Ans->outlen = 32768;
-    for(int i = 1; i <= Ans->outlen; ++i)
-    {
-        if(passwordmap.find(i)!=passwordmap.end())
-            Ans->ComNodeOut[i] = Q[passwordmap[i]];
-        else
-            Ans->ComNodeOut[i].Len = 0;
-    }
+    Ans->outlen = 0;
+    for(int i = 0; i <  286; ++i) Ans->ComNodeOut[i].Len = 0, Ans->ComNodeOut[i].Code = 0, Ans->ComNodeOut[i].C = 0;
+    for(int i = 0; i <  inlen; ++i)
+        Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]],
+        Ans->outlen = std::max(Ans->outlen,stream_after_lzss[i]);
 
     Q.clear();
     DEL(container.top());
