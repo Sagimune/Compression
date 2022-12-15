@@ -8,7 +8,7 @@
 #include<QDebug>
 #include<bitset>
 
-#define MAXLZBUFFER     258
+#define MAXLZBUFFER     9
 #define MAXLZSW         32768
 #define MINLZLEN        3
 #define BLOCKSIZE       16383
