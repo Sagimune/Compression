@@ -77,7 +77,7 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
         fclose(file);
 
         //motify outlen & data
-        out = doCompress(data, inlen, outlen, 0);
+        out = doCompress(data, inlen, outlen, method);
 
         crc_32 = crc32(0, (char*)data, inlen);
         lf1.crc_32 = crc_32;
@@ -147,7 +147,14 @@ BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int metho
 {
     if(method == 8)
     {
+        LZSS *test = new LZSS((BYTE*)stream, inlen);
+        lzss_result *result = test->dolzss();
+        qDebug() << result->src_result[0];
+        qDebug() << result->LL_result[0];
+        qDebug() << result->Distance_result[0];
 
+        outlen = inlen;
+        return stream;
     }
     else
     {
@@ -199,6 +206,44 @@ void zipcompression::compression(char* dir, char* outfile, int method)
 
     fclose(output);
 }
+
+void zipcompression::compressionOne(char* dir, char* name, char* outfile, int method)
+{
+    filecount = 1;
+
+    FILE* output = fopen(outfile, "wb");
+    FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
+    DWORD lfsize, cdsize, crc_32, offset;
+    int datalen;
+
+    lfsize = cdsize = crc_32 = offset = 0;
+    lfsize += pack_onefileheader(dir, name, method, output, crc_32, datalen);
+    cdsize += pack_onecdheader(dir, name, method, tmpcdfile, datalen, crc_32, offset);
+    offset = lfsize;
+
+
+    fclose(tmpcdfile);
+    tmpcdfile = fopen("tmp.tmp", "r");
+
+    while(!feof(tmpcdfile))
+    {
+        char ch = fgetc(tmpcdfile);
+        if(ch == EOF) break;
+        fprintf(output, "%c", ch);
+    }
+    remove("tmp.tmp");
+
+    //ECDrecord
+    struct ECDrecord footer;
+    footer.total_number_of_entries_in_cd_on_this_disk = filecount;
+    footer.total_number_of_entries_in_cd = filecount;
+    footer.size_of_the_central_directory = cdsize;
+    footer.offset_of_cd_start_with_respect_to_the_starting_disk_number = lfsize;
+    fwrite(&footer, sizeof(footer), 1, output);
+
+    fclose(output);
+}
+
 
 BYTE* zipcompression::doDecompress(BYTE* stream, int inlen, int &outlen, int method)
 {

@@ -38,6 +38,7 @@ public:
     DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &datalen);
     DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset);
     void compression(char* dir, char* outfile, int method);
+    void compressionOne(char* dir, char* name, char* outfile, int method);
 
     BYTE* doDecompress(BYTE* stream, int inlen, int &outlen, int method);
     bool viewzip(char *zipfilename);
