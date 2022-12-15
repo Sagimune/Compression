@@ -6,10 +6,10 @@ extern struct drawData drawdata[1024];
 test::test()
 {
     bool flag = true;
-    flag |= testQByteArray2QString();
+    //flag |= testQByteArray2QString();
     //flag |= testLZSS();
-    //flag |= testNoCompression();
-    flag |= testCLCode();
+    flag |= testNoCompression();
+    //flag |= testCLCode();
 
     if(flag)
         qDebug() << "测试通过 ";
@@ -35,34 +35,37 @@ bool test::testQByteArray2QString()
 
 bool test::testLZSS()
 {
-    char stream[] = "ABCDEABCD ABCDEABCD";
+    char stream[] = "As mentioned above,there are many kinds of wireless systems other than cellular.";
+    //char stream[] = "ABCDEABCD ABCDEABCD";
     LZSS *test = new LZSS((BYTE*)stream, strlen(stream));
-    int *result = test->dolzss();
-    for(int i = 1; i <= result[0]; i ++ )
-    {
-        qDebug() << result[i] << " ";
-    }
+    //int *result = test->dolzss();
+    //for(int i = 1; i <= result[0]; i ++ )
+    //{
+    //    qDebug() << result[i] << " ";
+    //}
     return true;
 }
 
 bool test::testNoCompression()
 {
     zipcompression *test = new zipcompression;
-    char outfile[] = "D:\\git\\test\\test1215.zip";
-    //char dir[] = "D:\\git\\test\\mul\\";
-    char dir[] = "D:\\git\\test\\include\\";
+    char outfile[] = "D:\\git\\test\\test1216.zip";
+    char dir[] = "D:\\git\\test\\Test.txt";
+    char name[] = "Test.txt";
+    //char dir[] = "D:\\git\\test\\include\\";
 
     char dedir[] = "D:\\git\\test\\testde\\";
     char defile[] = "D:\\git\\test\\test1215.zip";
 
-    test->compression(dir, outfile, 0);
-    test->viewzip(defile);
-    test->decompress(defile, dedir);
+    test->compressionOne(dir, name, outfile, 0);
+    //test->compressionOne(dir, name, outfile, 8);
+    //test->viewzip(defile);
+    //test->decompress(defile, dedir);
 
-    for(int i = 0; i < gfilecount; i ++ )
-    {
-        qDebug() << i << ": "<< drawdata[i].filename;
-    }
+    //for(int i = 0; i < gfilecount; i ++ )
+    //{
+    //    qDebug() << i << ": "<< drawdata[i].filename;
+    //}
 
 
     return true;

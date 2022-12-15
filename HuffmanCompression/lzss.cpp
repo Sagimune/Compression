@@ -25,7 +25,7 @@ LZSS::LZSS(BYTE* _stream, int len)
 
 bool LZSS::read(int len)
 {
-    for(int i = 0; i < std::min(len, reslen); i ++)
+    for(int i = 0; i < min(len, reslen); i ++)
     {
         if(buffercount < MAXLZBUFFER)
         {
@@ -88,7 +88,7 @@ bool LZSS::find()
     {
         if(slideWindow[i] == buffer[bufferleft])
         {
-            for(int offset = 0; offset < std::min(buffercount, swcount); offset ++)
+            for(int offset = 0; offset < min(buffercount, swcount); offset ++)
             {
                 if(slideWindow[(i + offset) % MAXLZSW] == buffer[(bufferleft + offset) % MAXLZBUFFER])
                 {
@@ -136,27 +136,44 @@ void LZSS::ld2code(int length, int distance)
 
 }
 
-int* LZSS::dolzss()
+struct lzss_result* LZSS::dolzss()
 {
+    struct lzss_result* result = new lzss_result;
+    int src_count = 0, ll_count = 0, dist_count = 0;
+
     int count = 0;
     do
     {
         bool res = find();
         if(res)
         {
-            for(int i = 1; i <= 4; i ++ ) result[++ rescount] = *(ldcode_res + i);
+            for(int i = 1; i <= 4; i ++ )
+            {
+                //result[++ rescount] = *(ldcode_res + i);
+                result->src_result[++src_count] = *(ldcode_res + i);
+            }
+
+            result->LL_result[++ll_count] = *(ldcode_res + 1);
+            result->Distance_result[++dist_count] = *(ldcode_res + 3);
+
             read(ldcode_res[0]);
             count += ldcode_res[0];
         }
         else
         {
-            result[++ rescount] = *(buffer + bufferleft);
+            result->src_result[++src_count] = *(buffer + bufferleft);
+            result->LL_result[++ll_count] = *(buffer + bufferleft);
             read(1);
             count += 1;
         }
     }while(count < streamlen);
 
-    result[0] = rescount;
+    result->src_result[++src_count] = 256;
+    result->LL_result[++ll_count] = 256;
+
+    result->src_result[0] = src_count;
+    result->LL_result[0] = ll_count;
+    result->Distance_result[0] = dist_count;
     return result;
 }
 

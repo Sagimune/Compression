@@ -39,7 +39,6 @@ static int length_code_extra[] = {0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,
 static int distance_code_list[]  = {1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,25477};
 static int distance_code_extra[] = {0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13};
 
-
 class LZSS
 {
 public:
@@ -65,7 +64,7 @@ public:
 
     void ld2code(int length, int distance);
 
-    int* dolzss();
+    struct lzss_result* dolzss();
 };
 
 
