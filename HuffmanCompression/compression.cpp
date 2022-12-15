@@ -112,7 +112,7 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     huffman_result* Ans = new huffman_result;
     Ans->outlen = 0;
     for(int i = 0; i <  286; ++i) Ans->ComNodeOut[i].Len = 0, Ans->ComNodeOut[i].Code = 0, Ans->ComNodeOut[i].C = 0;
-    for(int i = 0; i <  inlen; ++i)
+    for(int i = 1; i <=  inlen; ++i)
     {
         Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]];
         if(Ans->outlen < stream_after_lzss[i]) Ans->outlen = stream_after_lzss[i];
