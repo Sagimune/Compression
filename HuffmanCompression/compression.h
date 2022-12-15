@@ -9,11 +9,10 @@
 #include <queue>
 #include <string>
 #include <ctime>
-#include "stdatx.h"
 
 struct Node
 {
-    unsigned int C;
+    unsigned char C;
     unsigned int weight;
     Node *L,*R;
     bool leaf;
@@ -22,42 +21,26 @@ struct CMP
 {
     bool operator() (Node* A,Node *B)
     {
-        return A->weight == B->weight ? A->C > B->C: A->weight > B->weight;
-    }
-};
-
-class Comcmp
-{
-public:
-    bool operator() (const ComparisonNode &a, const ComparisonNode &b)
-    {
-        return a.Len==b.Len ? a.C < b.C : a.Len<b.Len;
+        return A->weight > B->weight;
     }
 };
 
 class Compression : public QMainWindow
 {
 private:
-    int QSIZE,Qge,Qwei;
-    QMap<unsigned int,unsigned int> weightmap;
+    QMap<unsigned char,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<unsigned int,unsigned int> passwordmap;
-    QVector<ComparisonNode> Q;
+    QMap<unsigned char,std::string> passwordmap;
 public:
     Compression();
     void Zip(QString path);
     void UnZip(QString path);
-    huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
-    void ziphuffman_decode_init();
-    int ziphuffman_decode(bool code);
-    void ziphuffman_recovery(undecode_huffman *srcdata);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
     void Container_Init();
     void HuffmanTree_Init();
-    void ZipPassword_Get(Node *root, unsigned int len);
-    void ZipPassword_Init(bool type);
+    void ZipPassword_Init(Node *root, std::string password);
 };
 
 #endif // COMPRESSION_H
