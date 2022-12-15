@@ -13,7 +13,7 @@
 
 struct Node
 {
-    unsigned char C;
+    unsigned int C;
     unsigned int weight;
     Node *L,*R;
     bool leaf;
@@ -38,9 +38,9 @@ public:
 class Compression : public QMainWindow
 {
 private:
-    QMap<unsigned char,unsigned int> weightmap;
+    QMap<unsigned int,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<unsigned char,unsigned int> passwordmap;
+    QMap<unsigned int,unsigned int> passwordmap;
     QVector<ComparisonNode> Q;
 public:
     Compression();
