@@ -26,11 +26,6 @@ struct CMP
     }
 };
 
-struct ComparisonNode
-{
-    unsigned int Code,Len;
-    unsigned char C;
-};
 class Comcmp
 {
 public:
@@ -45,12 +40,13 @@ class Compression : public QMainWindow
 private:
     QMap<unsigned char,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<unsigned char,std::string> passwordmap;
+    QMap<unsigned char,unsigned int> passwordmap;
     QVector<ComparisonNode> Q;
 public:
     Compression();
     void Zip(QString path);
     void UnZip(QString path);
+    huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
