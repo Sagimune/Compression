@@ -12,6 +12,7 @@
 #include<qscreen.h>
 #include"mypushbutton.h"
 #include"viewfiles.h"
+
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -60,19 +61,20 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     openfile->setParent(contentWidget);
 
     openfile->show();
-    connect(openfile,&QPushButton::clicked,[=]()
-    {
-        viewfiles *view = new viewfiles;
-        view->show();
-    });
+
     mypushbutton *zuixiaohua = new mypushbutton(":/new/prefix1/Resoures/hide.png");
     zuixiaohua->setGeometry(1110,0,25,25);
     zuixiaohua->setParent(contentWidget);
     zuixiaohua->show();
 
-    mypushbutton *check = new mypushbutton(":/new/prefix1/Resoures/check.png");
-    check->setGeometry(475,350,25,30);
-    check->setParent(contentWidget);
+    mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
+    jieya->setGeometry(475,350,25,30);
+    jieya->setParent(contentWidget);
+    connect(jieya,&QPushButton::clicked,[=]()
+    {
+        viewfiles *view = new viewfiles;
+        view->show();
+    });
 
     contentWidget->setLayout(layout);
     contentWidget->setObjectName("contentWidget");
