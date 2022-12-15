@@ -38,6 +38,7 @@ public:
 class Compression : public QMainWindow
 {
 private:
+    int QSIZE,Qge,Qwei;
     QMap<unsigned int,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
     QMap<unsigned int,unsigned int> passwordmap;
@@ -47,6 +48,8 @@ public:
     void Zip(QString path);
     void UnZip(QString path);
     huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
+    void ziphuffman_decode_init();
+    int ziphuffman_decode(bool code);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
