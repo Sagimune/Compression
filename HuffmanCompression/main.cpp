@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+
     QWidget *contentWidget = new QWidget;
     FramelessWindow *window = new FramelessWindow(contentWidget);
     window->resize(1200,600);
