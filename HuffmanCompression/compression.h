@@ -9,7 +9,6 @@
 #include <queue>
 #include <string>
 #include <ctime>
-#include <QVector>
 
 struct Node
 {
