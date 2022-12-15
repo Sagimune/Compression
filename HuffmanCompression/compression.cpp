@@ -3,6 +3,9 @@
 
 unsigned long long INTMAX = 4294967295ull;
 
+//ComparisonNode : len == 0 means no result
+int ziphuffman_decode(ComparisonNode *code);
+
 Compression::Compression()
 {
 
