@@ -12,4 +12,11 @@
 #define MINLZLEN        3
 #define BLOCKSIZE       16383
 
+struct huffman_result
+{
+    char huffman_code[BLOCKSIZE];
+    int code_length[BLOCKSIZE];
+    int outlen;
+};
+
 #endif // STDATX_H

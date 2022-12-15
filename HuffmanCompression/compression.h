@@ -9,6 +9,7 @@
 #include <queue>
 #include <string>
 #include <ctime>
+#include "stdatx.h"
 
 struct Node
 {

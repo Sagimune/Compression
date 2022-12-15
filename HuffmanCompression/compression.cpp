@@ -3,6 +3,8 @@
 
 unsigned long long INTMAX = 4294967295ull;
 
+huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
+
 Compression::Compression()
 {
 
