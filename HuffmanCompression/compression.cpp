@@ -127,14 +127,14 @@ void Compression::ziphuffman_decode_init(){ Qge = Qwei = 0;}
 int Compression::ziphuffman_decode(bool c)
 {
     while(Qge<QSIZE&&Q[Qge].Code[Qwei]!=c) Qge++;
-    if(Qge>=QSIZE) {ziphuffman_decode_init(); return -1;}//出现了不存在的值
+    if(Qge>=QSIZE) {ziphuffman_decode_init(); return -2;}//出现了不存在的值
     if(++Qwei == (int)Q[Qge].Len)
     {
         int Ans = Q[Qge].C;
         ziphuffman_decode_init();
         return Ans;
     }
-    return 0;//还没找到
+    return -1;//还没找到
 }
 //Zip和Unzip目前不可用
 /*
