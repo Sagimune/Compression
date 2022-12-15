@@ -80,8 +80,8 @@ void Compression::ZipPassword_Init(bool type)
     }
     std::sort(Q.begin(),Q.end(),Comcmp());
     Q[0].Code = 0; passwordmap[Q[0].C] = 0;
-    if(Q.size()<2) return;
     QSIZE = Q.size();
+    if(Q.size()<2) return;
     for(int i = 1; i < QSIZE; ++i)
     {
         Q[i].Code = Q[i-1].Code;
