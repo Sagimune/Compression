@@ -3,19 +3,26 @@
 
 #include<windows.h>
 #include<string.h>
-#include<qDebug>
 #include<stdio.h>
 #include<stdlib.h>
+#include<QDebug>
+#include<bitset>
 
 #define MAXLZBUFFER     9
 #define MAXLZSW         32768
 #define MINLZLEN        3
 #define BLOCKSIZE       16383
 
+struct ComparisonNode
+{
+    std::bitset<1024>Code;
+    unsigned int Len;
+    unsigned char C;
+};
+
 struct huffman_result
 {
-    char huffman_code[BLOCKSIZE];
-    int code_length[BLOCKSIZE];
+    ComparisonNode ComNodeOut[BLOCKSIZE];
     int outlen;
 };
 
