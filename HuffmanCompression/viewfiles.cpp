@@ -33,7 +33,7 @@ viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
         qDebug()<<i<<"=i";
         qDebug()<<QString(QLatin1String(zipfile.filename[i]));
         QString str=QString(QLatin1String(zipfile.filename[i]));
-        if(str.endsWith('\\'))
+        if(str.endsWith('/'))
         {
             qDebug()<<"file"<<i<<"is a folder";
             j = 0;

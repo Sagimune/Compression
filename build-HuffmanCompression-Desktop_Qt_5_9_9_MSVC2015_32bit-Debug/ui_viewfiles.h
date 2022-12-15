@@ -28,10 +28,10 @@ public:
     {
         if (viewfiles->objectName().isEmpty())
             viewfiles->setObjectName(QStringLiteral("viewfiles"));
-        viewfiles->resize(954, 472);
+        viewfiles->resize(1243, 547);
         treeView = new QTreeView(viewfiles);
         treeView->setObjectName(QStringLiteral("treeView"));
-        treeView->setGeometry(QRect(10, 10, 641, 331));
+        treeView->setGeometry(QRect(10, 10, 1231, 421));
 
         retranslateUi(viewfiles);
 
