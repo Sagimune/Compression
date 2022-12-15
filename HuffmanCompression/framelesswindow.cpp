@@ -66,6 +66,13 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     zuixiaohua->setGeometry(1110,0,25,25);
     zuixiaohua->setParent(contentWidget);
     zuixiaohua->show();
+    connect(zuixiaohua,&QPushButton::clicked,[=]()
+    {
+        this->lower();
+        contentWidget->lower();
+    });
+
+
 
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
     jieya->setGeometry(475,350,25,30);
