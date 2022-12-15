@@ -116,6 +116,7 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     {
         Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]];
         if(Ans->outlen < stream_after_lzss[i]) Ans->outlen = stream_after_lzss[i];
+        qDebug() << "huffman:  " << Ans->outlen << " : " << stream_after_lzss[i];
     }
 
     Q.clear();

@@ -49,14 +49,17 @@ bool test::testLZSS()
 bool test::testNoCompression()
 {
     zipcompression *test = new zipcompression;
-    char outfile[] = "D:\\git\\test\\test1216.zip";
-    char dir[] = "D:\\git\\test\\Test.txt";
-    char name[] = "Test.txt";
+
     //char dir[] = "D:\\git\\test\\include\\";
 
     char dedir[] = "D:\\git\\test\\testde\\";
     char defile[] = "D:\\git\\test\\test1215.zip";
 
+
+
+    char outfile[] = "D:\\git\\test\\test1216.zip";
+    char dir[] = "D:\\git\\test\\Test.txt";
+    char name[] = "Test.txt";
     test->compressionOne(dir, name, outfile, 8);
     //test->compressionOne(dir, name, outfile, 8);
     //test->viewzip(defile);

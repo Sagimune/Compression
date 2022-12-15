@@ -157,15 +157,67 @@ BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int metho
 
         huffman_result* LL_huffman = tool.ziphuffman_encode(result->LL_result + 1, result->LL_result[0]);
         huffman_result* Dist_huffman = tool.ziphuffman_encode(result->Distance_result + 1, result->Distance_result[0]);
-        for(int i = 0; i < LL_huffman->outlen; i ++ )
+        for(int i = 0; i < Dist_huffman->outlen; i ++ )
         {
-            ComparisonNode *data = &LL_huffman->ComNodeOut[i];
+            ComparisonNode *data = &Dist_huffman->ComNodeOut[i];
             if(data->Len)
             {
                 std::string str = (data->Code).to_string();
                 qDebug() << data->C << " : " << data->Len << " : " << QString::fromStdString(str);
             }
         }
+
+        //change code with LLresult->src_result  ----> get sourcecode
+
+        //codelength LL & Dist (cat) & pass 0 end
+        int LL_codelength[287];
+        memset(LL_codelength, 0, sizeof(LL_codelength));
+        for(int i = 0; i < LL_huffman->outlen; i ++ )
+        {
+            ComparisonNode *data = &LL_huffman->ComNodeOut[i];
+            LL_codelength[data->C] = data->Len;
+        }
+        int outlen = 0;
+        int *CLL = clcodeEncode(LL_codelength, 286, outlen);
+        for(int i = 0; i < outlen; i ++ )
+        {
+            qDebug() << CLL[i];
+        }
+
+        qDebug() << "-------------------------------------------";
+
+        int Dist_codelength[31];
+        memset(Dist_codelength, 0, sizeof(Dist_codelength));
+        for(int i = 0; i < Dist_huffman->outlen; i ++ )
+        {
+            ComparisonNode *data = &Dist_huffman->ComNodeOut[i];
+            Dist_codelength[data->C] = data->Len;
+            std::string str = (data->Code).to_string();
+            qDebug() << data->C << " : " << data->Len << " : " << QString::fromStdString(str);
+        }
+        int outlen2 = 0;
+        int *CDist = clcodeEncode(Dist_codelength, 30, outlen2);
+        for(int i = 0; i < outlen2; i ++ )
+        {
+            qDebug() << CDist[i];
+        }
+
+        //CL do huffman
+
+        //sort CCL
+
+        //writefile
+
+        //IS_LAST BTYPE HLIT HDIST HCLEN
+
+        //CCL
+
+        //LL code
+
+        //Distance code
+
+        //Source code
+
 
         outlen = inlen;
         return stream;
