@@ -1,6 +1,5 @@
 #include "compression.h"
 #include <QDebug>
-using namespace std;
 unsigned long long INTMAX = 4294967295ull;
 
 Compression::Compression()
@@ -114,8 +113,10 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     Ans->outlen = 0;
     for(int i = 0; i <  286; ++i) Ans->ComNodeOut[i].Len = 0, Ans->ComNodeOut[i].Code = 0, Ans->ComNodeOut[i].C = 0;
     for(int i = 0; i <  inlen; ++i)
-        Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]],
-        Ans->outlen = max(Ans->outlen,stream_after_lzss[i]);
+    {
+        Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]];
+        if(Ans->outlen < stream_after_lzss[i]) Ans->outlen = stream_after_lzss[i];
+    }
 
     Q.clear();
     DEL(container.top());
