@@ -21,7 +21,7 @@ struct FramelessWindowPrivate {
     QPoint windowPositionAsDrag; // 鼠标按小时窗口左上角的坐标
 
 };
-
+int i = 1;
 FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWidget(parent) {
     setWindowFlags(Qt::FramelessWindowHint);    // 去掉边框
     setAttribute(Qt::WA_TranslucentBackground); // 背景透明
@@ -78,12 +78,40 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         this->lower();
         contentWidget->lower();
     });
-
-
-
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
     jieya->setGeometry(475,350,25,30);
     jieya->setParent(contentWidget);
+
+    connect(zuidahua,&QPushButton::clicked,[=]()
+    {
+        if(i%2!=0)
+        {
+            this->showMaximized();
+            contentWidget->showMaximized();
+            exit->setGeometry(2525,0,25,25);
+            zuidahua->setGeometry(2500,0,25,25);
+            zuixiaohua->setGeometry(2475,0,25,25);
+            text->setGeometry(5,30,2540,600);
+            newfile->setGeometry(600,800,25,30);
+            jieya->setGeometry(1200,800,25,30);
+            openfile->setGeometry(1800,800,25,30);
+            i++;
+        }
+        else
+        {
+            this->showNormal();
+            contentWidget->showNormal();
+            exit->setGeometry(1160,0,25,25);
+            zuidahua->setGeometry(1135,0,25,25);
+            newfile->setGeometry(250,350,25,30);
+            openfile->setGeometry(700,350,25,30);
+            zuixiaohua->setGeometry(1110,0,25,25);
+            jieya->setGeometry(475,350,25,30);
+            text->setGeometry(5,30,1180,300);
+            i++;
+        }
+    });
+
 
 
     contentWidget->setLayout(layout);
