@@ -36,7 +36,7 @@ void Compression::Weightmap_Init(QFile& in)
 
 void Compression::Container_Init()
 {
-    for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned int,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
         Node *Hnode = new Node;
         Hnode->C = it.key();
@@ -110,9 +110,14 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     ZipPassword_Init(0);
 
     huffman_result* Ans = new huffman_result;
-    Ans->outlen = inlen;
-    for(int i = 0; i < Ans->outlen; ++i)
-        Ans->ComNodeOut[i] = Q[passwordmap[stream_after_lzss[i]]];
+    Ans->outlen = 32768;
+    for(int i = 1; i <= Ans->outlen; ++i)
+    {
+        if(passwordmap.find(i)!=passwordmap.end())
+            Ans->ComNodeOut[i] = Q[passwordmap[i]];
+        else
+            Ans->ComNodeOut[i].Len = 0;
+    }
 
     Q.clear();
     DEL(container.top());
