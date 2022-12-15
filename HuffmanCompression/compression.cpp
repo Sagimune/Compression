@@ -3,10 +3,6 @@
 
 unsigned long long INTMAX = 4294967295ull;
 
-//UndecodeNode : len == -1 means no result
-int ziphuffman_decode(bool code);
-void ziphuffman_recovery(undecode_huffman *srcdata);
-
 Compression::Compression()
 {
 
@@ -36,7 +32,7 @@ void Compression::Weightmap_Init(QFile& in)
 
 void Compression::Container_Init()
 {
-    for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
+    for(QMap<unsigned int,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
         Node *Hnode = new Node;
         Hnode->C = it.key();
@@ -81,11 +77,11 @@ void Compression::ZipPassword_Init(bool type)
     if(type==0)
     {
         ZipPassword_Get(container.top(),1);
-        std::sort(Q.begin(),Q.end(),Comcmp());
     }
+    std::sort(Q.begin(),Q.end(),Comcmp());
     Q[0].Code = 0; passwordmap[Q[0].C] = 0;
+    QSIZE = Q.size();
     if(Q.size()<2) return;
-    int QSIZE = Q.size();
     for(int i = 1; i < QSIZE; ++i)
     {
         Q[i].Code = Q[i-1].Code;
@@ -101,6 +97,11 @@ void Compression::ZipPassword_Init(bool type)
 
 huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen)
 {
+    Q.clear();
+    if(container.size()) DEL(container.top()),container.pop();
+    weightmap.clear();
+    passwordmap.clear();
+
     for(int i = 0; i < inlen; ++i)
     {
         weightmap[stream_after_lzss[i]]++;
@@ -110,9 +111,11 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     ZipPassword_Init(0);
 
     huffman_result* Ans = new huffman_result;
-    Ans->outlen = inlen;
-    for(int i = 0; i < Ans->outlen; ++i)
-        Ans->ComNodeOut[i] = Q[passwordmap[stream_after_lzss[i]]];
+    Ans->outlen = 0;
+    for(int i = 0; i <  286; ++i) Ans->ComNodeOut[i].Len = 0, Ans->ComNodeOut[i].Code = 0, Ans->ComNodeOut[i].C = 0;
+    for(int i = 0; i <  inlen; ++i)
+        Ans->ComNodeOut[stream_after_lzss[i]] = Q[passwordmap[stream_after_lzss[i]]],
+        Ans->outlen = std::max(Ans->outlen,stream_after_lzss[i]);
 
     Q.clear();
     DEL(container.top());
@@ -121,6 +124,41 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     passwordmap.clear();
 
     return Ans;
+}
+
+void Compression::ziphuffman_recovery(undecode_huffman *srcdata)
+{
+    if(srcdata->inlen == -1) return;
+
+    Q.clear();
+    if(container.size()) DEL(container.top()),container.pop();
+    weightmap.clear();
+    passwordmap.clear();
+
+    for(int i = 0; i <=  srcdata->inlen; ++i)
+    if(srcdata->codelength[i]>0)
+    {
+        ComparisonNode tmp;
+        tmp.C = i,tmp.Len = srcdata->codelength[i],tmp.Code = 0;
+        Q.push_back(tmp);
+    }
+    ZipPassword_Init(1);
+}
+
+//先读哈夫曼表ziphuffman_recovery()
+//从头开始找/第一次找需要先引用ziphuffman_decode_init()
+void Compression::ziphuffman_decode_init(){ Qge = Qwei = 0;}
+int Compression::ziphuffman_decode(bool c)
+{
+    while(Qge<QSIZE&&Q[Qge].Code[Qwei]!=c) Qge++;
+    if(Qge>=QSIZE) {ziphuffman_decode_init(); return -2;}//出现了不存在的值
+    if(++Qwei == (int)Q[Qge].Len)
+    {
+        int Ans = Q[Qge].C;
+        ziphuffman_decode_init();
+        return Ans;
+    }
+    return -1;//还没找到
 }
 //Zip和Unzip目前不可用
 /*

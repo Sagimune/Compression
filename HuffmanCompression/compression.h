@@ -13,7 +13,7 @@
 
 struct Node
 {
-    unsigned char C;
+    unsigned int C;
     unsigned int weight;
     Node *L,*R;
     bool leaf;
@@ -38,15 +38,19 @@ public:
 class Compression : public QMainWindow
 {
 private:
-    QMap<unsigned char,unsigned int> weightmap;
+    int QSIZE,Qge,Qwei;
+    QMap<unsigned int,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
-    QMap<unsigned char,unsigned int> passwordmap;
+    QMap<unsigned int,unsigned int> passwordmap;
     QVector<ComparisonNode> Q;
 public:
     Compression();
     void Zip(QString path);
     void UnZip(QString path);
     huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
+    void ziphuffman_decode_init();
+    int ziphuffman_decode(bool code);
+    void ziphuffman_recovery(undecode_huffman *srcdata);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
