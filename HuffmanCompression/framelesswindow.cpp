@@ -12,7 +12,7 @@
 #include<qscreen.h>
 #include"mypushbutton.h"
 #include"viewfiles.h"
-
+#include<QFileDialog>
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -47,7 +47,6 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     mypushbutton *zuidahua = new mypushbutton(":/new/prefix1/Resoures/bigger.png");
     zuidahua->setGeometry(1135,0,25,25);
     zuidahua->setParent(contentWidget);
-
     zuidahua->show();
 
     mypushbutton *newfile = new mypushbutton(":/new/prefix1/Resoures/newfile.png");
@@ -59,9 +58,17 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     mypushbutton *openfile = new mypushbutton(":/new/prefix1/Resoures/openfile.jpg");
     openfile->setGeometry(700,350,25,30);
     openfile->setParent(contentWidget);
-
     openfile->show();
-
+    connect(openfile,&QPushButton::clicked,[=]()
+    {
+        QString fileName = QFileDialog::getOpenFileName(this,tr(" 选择文件 "), "", tr("Text files (*.zip)"));
+        char* ch;
+        QByteArray ba = fileName.toLatin1(); // must
+        ch=ba.data();
+        qDebug()<<ch;
+        viewfiles *view = new viewfiles(ch);
+        view->show();
+    });
     mypushbutton *zuixiaohua = new mypushbutton(":/new/prefix1/Resoures/hide.png");
     zuixiaohua->setGeometry(1110,0,25,25);
     zuixiaohua->setParent(contentWidget);
@@ -77,11 +84,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
     jieya->setGeometry(475,350,25,30);
     jieya->setParent(contentWidget);
-    connect(jieya,&QPushButton::clicked,[=]()
-    {
-        viewfiles *view = new viewfiles;
-        view->show();
-    });
+
 
     contentWidget->setLayout(layout);
     contentWidget->setObjectName("contentWidget");

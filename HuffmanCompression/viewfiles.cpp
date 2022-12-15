@@ -1,5 +1,6 @@
 #include "viewfiles.h"
 #include "ui_viewfiles.h"
+#include"zipcompression.h"
 #include<QTextEdit>
 #include<QFileDialog>
 #include<QFileSystemModel>
@@ -13,59 +14,59 @@
 #include<QTemporaryFile>
 #include<QLabel>
 #include<QString>
-viewfiles::viewfiles(QWidget *parent) :
+viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::viewfiles)
 {
     ui->setupUi(this);
     QStandardItemModel *model = new QStandardItemModel(this);
-    path[0]="111\\";
-    path[1]="111\\nul2.txt";
-    path[2]="include.zip";
-    path[3]="mul1.txt";
-    QStandardItem *item[10][10];
+    zipfile.viewzip(zipfilename);
+    QStandardItem *item[255][255];
     int foldernum=0;
     int j=0;
     int folderlength;
-    QString foldername;
+    QString foldername="_";
     model->setHorizontalHeaderLabels(QStringList()<<"name"<<""<<" 压缩后大小 "<<" 类型 "<<" 压缩方式 ");
-    QPixmap pixmap;
-    for(int i = 0;i<4;i++)
+    qDebug()<<"cp2";
+    for(int i = 0;i<zipfile.filecount;i++)
     {
         qDebug()<<i<<"=i";
-        if(path[i].endsWith('\\'))
+        qDebug()<<QString(QLatin1String(zipfile.filename[i]));
+        QString str=QString(QLatin1String(zipfile.filename[i]));
+        if(str.endsWith('\\'))
         {
+            qDebug()<<"file"<<i<<"is a folder";
             j = 0;
-            QStandardItem *item = new QStandardItem(path[i].remove(path[i].length()-1,1));
+            QStandardItem *item = new QStandardItem(str.remove(str.length()-1,1));
             QFileIconProvider icon_provider;
             QIcon icon = icon_provider.icon(QFileIconProvider::Folder);
             item->setIcon(icon);
             model->setItem(foldernum++,0,item);
-            folderlength = path[i].length()+1;
-            foldername=path[i]; qDebug()<<foldername;
+            folderlength = str.length()+1;
+            foldername=str; qDebug()<<foldername;
         }
-        else if(path[i].startsWith(foldername))
+        else if(str.startsWith(foldername))
         {
-            item[foldernum-1][i] = new QStandardItem(path[i].remove(0,folderlength));
+            qDebug()<<"file"<<i<<"is under a folder";
+            item[foldernum-1][i] = new QStandardItem(str.remove(0,folderlength));
             model->item(foldernum-1,0)->setChild(j++,0,item[foldernum-1][i]);
-            std::string stdpath = path[i].toStdString();
+            std::string stdpath = str.toStdString();
             int dotnum = stdpath.find(".");
-            QIcon icon = fileExtensionIcon(path[i].remove(0,dotnum));
+            QIcon icon = fileExtensionIcon(str.remove(0,dotnum));
             item[foldernum-1][i]->setIcon(icon);
             qDebug()<<"NO."<<i<<"output completely";
         }
         else
         {
-
-            QStandardItem *item = new QStandardItem(path[i]);
+            qDebug()<<"file"<<i<<" is a single file ";
+            QStandardItem *item = new QStandardItem(str);
             model->setItem(foldernum++,0,item);
-            std::string stdpath = path[i].toStdString();
+            std::string stdpath = str.toStdString();
             int dotnum = stdpath.find(".");
-            QIcon icon = fileExtensionIcon(path[i].remove(0,dotnum));
+            QIcon icon = fileExtensionIcon(str.remove(0,dotnum));
             item->setIcon(icon);
         }
     }
-    qDebug()<<"cp3";
     ui->treeView->setModel(model);
 
     ui->treeView->expandAll();
