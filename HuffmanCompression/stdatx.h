@@ -20,6 +20,12 @@ struct ComparisonNode
     unsigned char C;
 };
 
+struct undecode_huffman
+{
+    int codelength[BLOCKSIZE];
+    int inlen;
+};
+
 struct huffman_result
 {
     ComparisonNode ComNodeOut[BLOCKSIZE];
