@@ -3,8 +3,6 @@
 
 unsigned long long INTMAX = 4294967295ull;
 
-huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
-
 Compression::Compression()
 {
 
@@ -66,7 +64,9 @@ void Compression::ZipPassword_Get(Node *x, unsigned int len)
 {
     if(x!=NULL&&x->leaf)
     {
-        //Q.push_back((ComparisonNode){0,len,x->C});
+        ComparisonNode tmp;
+        tmp.C = x->C,tmp.Len = len,tmp.Code = 0;
+        Q.push_back(tmp);
         return;
     }
     if(x->L!=NULL) ZipPassword_Get(x->L,len+1);
@@ -79,14 +79,47 @@ void Compression::ZipPassword_Init(bool type)
         ZipPassword_Get(container.top(),1);
         std::sort(Q.begin(),Q.end(),Comcmp());
     }
-    Q[0].Code = 0;
+    Q[0].Code = 0; passwordmap[Q[0].C] = 0;
     if(Q.size()<2) return;
     int QSIZE = Q.size();
     for(int i = 1; i < QSIZE; ++i)
-        Q[i].Code = (Q[i-1].Code+1)<<(Q[i].Len-Q[i-1].Len);
+    {
+        Q[i].Code = Q[i-1].Code;
+       int j = 0;
+       while(Q[i].Code[j]) Q[i].Code[j++] = 0;
+       Q[i].Code[j] = 1;
+       Q[i].Code <<= (Q[i].Len-Q[i-1].Len);
+
+       passwordmap[Q[i].C] = i;
+    }
 }
 
+
+huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen)
+{
+    for(int i = 0; i < inlen; ++i)
+    {
+        weightmap[stream_after_lzss[i]]++;
+    }
+    Container_Init();
+    HuffmanTree_Init();
+    ZipPassword_Init(0);
+
+    huffman_result* Ans = new huffman_result;
+    Ans->outlen = inlen;
+    for(int i = 0; i < Ans->outlen; ++i)
+        Ans->ComNodeOut[i] = Q[passwordmap[stream_after_lzss[i]]];
+
+    Q.clear();
+    DEL(container.top());
+    container.pop();
+    weightmap.clear();
+    passwordmap.clear();
+
+    return Ans;
+}
 //Zip和Unzip目前不可用
+/*
 void Compression::Zip(QString path)
 {
     QFile openfile(path);
@@ -216,3 +249,4 @@ void Compression::UnZip(QString path)
     container.pop();
     weightmap.clear();
 }
+*/
