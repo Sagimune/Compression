@@ -4,7 +4,6 @@
 unsigned long long INTMAX = 4294967295ull;
 
 //UndecodeNode : len == -1 means no result
-int ziphuffman_decode(bool code);
 void ziphuffman_recovery(undecode_huffman *srcdata);
 
 Compression::Compression()
@@ -85,7 +84,7 @@ void Compression::ZipPassword_Init(bool type)
     }
     Q[0].Code = 0; passwordmap[Q[0].C] = 0;
     if(Q.size()<2) return;
-    int QSIZE = Q.size();
+    QSIZE = Q.size();
     for(int i = 1; i < QSIZE; ++i)
     {
         Q[i].Code = Q[i-1].Code;
@@ -123,6 +122,19 @@ huffman_result* Compression::ziphuffman_encode(int *stream_after_lzss, int inlen
     passwordmap.clear();
 
     return Ans;
+}
+void Compression::ziphuffman_decode_init(){ Qge = Qwei = 0;}
+int Compression::ziphuffman_decode(bool c)
+{
+    while(Qge<QSIZE&&Q[Qge].Code[Qwei]!=c) Qge++;
+    if(Qge>=QSIZE) {ziphuffman_decode_init(); return -1;}//出现了不存在的值
+    if(++Qwei == (int)Q[Qge].Len)
+    {
+        int Ans = Q[Qge].C;
+        ziphuffman_decode_init();
+        return Ans;
+    }
+    return 0;//还没找到
 }
 //Zip和Unzip目前不可用
 /*
