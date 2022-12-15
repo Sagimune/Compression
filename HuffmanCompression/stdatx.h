@@ -16,8 +16,7 @@
 struct ComparisonNode
 {
     std::bitset<1024>Code;
-    unsigned int Len;
-    unsigned char C;
+    unsigned int Len,C;
 };
 
 struct undecode_huffman
