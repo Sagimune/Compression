@@ -50,6 +50,7 @@ public:
     huffman_result* ziphuffman_encode(int *stream_after_lzss, int inlen);
     void ziphuffman_decode_init();
     int ziphuffman_decode(bool code);
+    void ziphuffman_recovery(undecode_huffman *srcdata);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
