@@ -18,7 +18,6 @@ viewfiles::viewfiles(QWidget *parent) :
     ui(new Ui::viewfiles)
 {
     ui->setupUi(this);
-    qDebug()<<"cp1";
     QStandardItemModel *model = new QStandardItemModel(this);
     path[0]="111\\";
     path[1]="111\\nul2.txt";
@@ -29,7 +28,6 @@ viewfiles::viewfiles(QWidget *parent) :
     int j=0;
     int folderlength;
     QString foldername;
-    qDebug()<<"cp2";
     model->setHorizontalHeaderLabels(QStringList()<<"name"<<""<<" 压缩后大小 "<<" 类型 "<<" 压缩方式 ");
     QPixmap pixmap;
     for(int i = 0;i<4;i++)
@@ -48,9 +46,6 @@ viewfiles::viewfiles(QWidget *parent) :
         }
         else if(path[i].startsWith(foldername))
         {
-
-            qDebug()<<" 第 "<<i<<" 个不是文件夹 ";
-
             item[foldernum-1][i] = new QStandardItem(path[i].remove(0,folderlength));
             model->item(foldernum-1,0)->setChild(j++,0,item[foldernum-1][i]);
             std::string stdpath = path[i].toStdString();
