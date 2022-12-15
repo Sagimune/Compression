@@ -23,14 +23,14 @@ public:
     QTextEdit *text;
     QGraphicsDropShadowEffect *shadowEffect;
     QGridLayout *lo;
-
+    FramelessWindowPrivate *d;
 protected:
     void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
 
 private:
-    FramelessWindowPrivate *d;
+
 };
 
 #endif // FRAMELESSWINDOW_H

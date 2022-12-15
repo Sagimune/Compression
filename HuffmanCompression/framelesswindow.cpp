@@ -13,6 +13,8 @@
 #include"mypushbutton.h"
 #include"viewfiles.h"
 #include<QFileDialog>
+#include"compression.h"
+
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -47,12 +49,36 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     mypushbutton *zuidahua = new mypushbutton(":/new/prefix1/Resoures/bigger.png");
     zuidahua->setGeometry(1135,0,25,25);
     zuidahua->setParent(contentWidget);
-    zuidahua->show();
+
 
     mypushbutton *newfile = new mypushbutton(":/new/prefix1/Resoures/newfile.png");
     newfile->setGeometry(250,350,25,30);
     newfile->setParent(contentWidget);
+    connect(newfile,&QPushButton::clicked,[=]()
+    {
+        zipcompression *test = new zipcompression;
+        QString fileName = text->toPlainText();
+        char* ch;
+        fileName.remove("file:///");
+        qDebug()<<fileName;
+        if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
 
+
+        QByteArray ba = fileName.toLatin1(); // must
+        ch=ba.data();
+
+        qDebug()<<ch;
+        QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
+        savepath.append(".zip");
+        if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
+
+        QByteArray da = savepath.toLatin1(); // must
+        char * sh;
+        sh=da.data();
+        qDebug()<<sh;
+        test->compression(ch,sh,0);
+        // must
+    });
     newfile->show();
 
     mypushbutton *openfile = new mypushbutton(":/new/prefix1/Resoures/openfile.jpg");
@@ -81,7 +107,27 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
     jieya->setGeometry(475,350,25,30);
     jieya->setParent(contentWidget);
+    connect(jieya,&QPushButton::clicked,[=]()
+    {
+        zipcompression *test = new zipcompression;
+        QString fileName = text->toPlainText();
+        char* ch;
+        if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
+        QByteArray ba = fileName.toLatin1(); // must
+        ch=ba.data();
 
+        qDebug()<<ch;
+        QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
+        if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
+
+        qDebug()<<savepath;
+        QByteArray da = savepath.toLatin1(); // must
+        char * sh;
+        sh=da.data();
+        qDebug()<<sh;
+        test->decompress(ch,sh);
+        // must
+    });
     connect(zuidahua,&QPushButton::clicked,[=]()
     {
         if(i%2!=0)
@@ -111,7 +157,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
             i++;
         }
     });
-
+    zuidahua->show();
 
 
     contentWidget->setLayout(layout);
