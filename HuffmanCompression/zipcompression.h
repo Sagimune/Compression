@@ -5,6 +5,7 @@
 #include "zipformat.h"
 #include "lzss.h"
 #include <bitset>
+#include "compression.h"
 
 struct drawData
 {

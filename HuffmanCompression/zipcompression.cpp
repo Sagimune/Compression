@@ -147,11 +147,25 @@ BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int metho
 {
     if(method == 8)
     {
+        Compression tool;
         LZSS *test = new LZSS((BYTE*)stream, inlen);
         lzss_result *result = test->dolzss();
+        qDebug() << "doCompress: LZSS count";
         qDebug() << result->src_result[0];
         qDebug() << result->LL_result[0];
         qDebug() << result->Distance_result[0];
+
+        huffman_result* LL_huffman = tool.ziphuffman_encode(result->LL_result + 1, result->LL_result[0]);
+        huffman_result* Dist_huffman = tool.ziphuffman_encode(result->Distance_result + 1, result->Distance_result[0]);
+        for(int i = 0; i < LL_huffman->outlen; i ++ )
+        {
+            ComparisonNode *data = &LL_huffman->ComNodeOut[i];
+            if(data->Len)
+            {
+                std::string str = (data->Code).to_string();
+                qDebug() << data->C << " : " << data->Len << " : " << QString::fromStdString(str);
+            }
+        }
 
         outlen = inlen;
         return stream;
