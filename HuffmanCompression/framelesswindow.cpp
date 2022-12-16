@@ -179,6 +179,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
             newfile->setGeometry(600,800,25,30);
             jieya->setGeometry(1200,800,25,30);
             openfile->setGeometry(1800,800,25,30);
+            pathedit->setGeometry(5,670,500,60);
             i++;
         }
         else
@@ -192,6 +193,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
             zuixiaohua->setGeometry(1110,0,25,25);
             jieya->setGeometry(475,400,25,30);
             text->setGeometry(5,30,1180,300);
+            pathedit->setGeometry(5,345,300,40);
             i++;
         }
     });
