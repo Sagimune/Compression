@@ -116,6 +116,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         sprintf(sh, "%s", da.data());
         qDebug()<<sh;
         test->compressionFile(sh,i+1);
+        text->clear();
 
     });
     newfile->show();
@@ -167,6 +168,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         sh=da.data();
         qDebug()<<sh;
         test->decompress(ch,sh);
+        text->clear();
         // must
     });
     connect(zuidahua,&QPushButton::clicked,[=]()
