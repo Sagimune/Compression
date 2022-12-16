@@ -78,7 +78,7 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
         fclose(file);
 
         //motify outlen & data
-        out = doCompress(data, inlen, outlen, 0);
+        out = doCompress(data, inlen, outlen, infilepath);
 
         crc_32 = crc32(0, (char*)data, inlen);
         lf1.crc_32 = crc_32;
@@ -104,7 +104,10 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
     fputs(infilename, output);
 
     //输出压缩数据
-    if(!isdir) fwrite(out, sizeof(BYTE), outlen, output);
+    if(!isdir)
+    {
+        fwrite(out, sizeof(BYTE), outlen, output);
+    }
 
     lfsize += sizeof(lf1);
     lfsize += strlen(infilename);
@@ -146,24 +149,48 @@ DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int m
     return cdsize;
 }
 
-BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int method)
+long get_file_size(FILE *stream)
 {
-    if(method == 8)
-    {
-
+    long file_size = -1;
+    long cur_offset = ftell(stream);	// 获取当前偏移位置
+    if (cur_offset == -1) {
+        printf("ftell failed :%s\n", strerror(errno));
+        return -1;
     }
-    else
-    {
-        outlen = inlen;
-        return stream;
+    if (fseek(stream, 0, SEEK_END) != 0) {	// 移动文件指针到文件末尾
+        printf("fseek failed: %s\n", strerror(errno));
+        return -1;
     }
-    return NULL;
+    file_size = ftell(stream);	// 获取此时偏移值，即文件大小
+    if (file_size == -1) {
+        printf("ftell failed :%s\n", strerror(errno));
+    }
+    if (fseek(stream, cur_offset, SEEK_SET) != 0) {	// 将文件指针恢复初始位置
+        printf("fseek failed: %s\n", strerror(errno));
+        return -1;
+    }
+    return file_size;
 }
 
-//0 : one file
-//1 : multi file
-//2 : dir
-//dir: 文件所在
+BYTE* zipcompression::doCompress(int &outlen, char* infilepath)
+{
+    //将文件给哈夫曼压缩
+    tool->Zip(QString(infilepath));
+
+    //获取结果文件，获取文件大小，new一个字节流，写入，设定返回大小，关闭，删除文件，返回字节流
+    FILE *compresstmp = fopen("haffuman.tmp", "wb");
+    int filesize = get_file_size(compresstmp);
+    BYTE *data = new BYTE[filesize];
+
+    fwrite(data, sizeof(BYTE), filesize, compresstmp);
+    outlen = filesize;
+
+    fclose(compresstmp);
+    remove("haffuman.tmp");
+
+    return data;
+}
+
 void zipcompression::compressionDir(char* dir, char* outfile)
 {
     filecount = 0;
@@ -247,25 +274,31 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     fclose(output);
 }
 
-
-
-BYTE* zipcompression::doDecompress(BYTE* stream, int inlen, int &outlen, int method)
+BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
 {
-    if(method == 8)
+    //分解文件头，zipfile输出inlen个字节
+    FILE *decompresstmp = fopen("haffuman2.tmp", "wb");
+
+    for(int i = 0; i < inlen; i ++ )
     {
-        //比特归类法
-        int op;
-        /*
-            1： read 3bit ： CCL
-            2： read
-        */
+        char ch = fgetc(zipfile);
+        fprintf(decompresstmp, "%c", ch);
     }
-    else
-    {
-        outlen = inlen;
-        return stream;
-    }
-    return NULL;
+    //关闭，将文件转交哈夫曼解压缩
+    fclose(decompresstmp);
+    tool->UnZip(QString("haffuman2.tmp"));
+
+    //获取解压缩结果文件，获取大小，new一个字节流，读进去，设定返回大小，关闭文件，删除文件，返回文件流
+    FILE *decompresstmp2 = fopen("haffuman3.tmp", "wb");
+    int filesize = get_file_size(decompresstmp2);
+    BYTE *data = new BYTE[filesize];
+
+    fwrite(data, sizeof(BYTE), filesize, decompresstmp2);
+    fclose(decompresstmp2);
+    remove("haffuman3.tmp");
+
+    outlen = filesize;
+    return data;
 }
 
 bool zipcompression::viewzip(char *zipfilename)
@@ -337,7 +370,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
             fread(datatmp, sizeof(BYTE), datasize, zipfile);
 
             int outlen;
-            BYTE *out = doDecompress(datatmp, datasize, outlen, fileheader->compression_method);
+            BYTE *out = doDecompress(zipfile, datasize, outlen);
 
             FILE *outfile = fopen(onefilename, "wb");
             fwrite(out, sizeof(BYTE), outlen, outfile);

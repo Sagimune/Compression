@@ -37,13 +37,13 @@ public:
     bool ListDirectoryContents(const char *sDir, int len);
     QWORD gettime();
     DWORD crc32(DWORD crc, const char *buf, int len);
-    BYTE* doCompress(BYTE* stream, int inlen, int &outlen, int method);
+    BYTE* doCompress(int &outlen, char* infilepath);
     DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &datalen);
     DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset);
     void compressionDir(char* dir, char* outfile);
     void compressionFile(char* outfile, int infilecount);
 
-    BYTE* doDecompress(BYTE* stream, int inlen, int &outlen, int method);
+    BYTE* doDecompress(FILE* zipfile, int inlen, int &outlen);
     bool viewzip(char *zipfilename);
     bool decompress(char *zipfilename, char* where);
 
