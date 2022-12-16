@@ -14,10 +14,14 @@
 #include<QTemporaryFile>
 #include<QLabel>
 #include<QString>
+#include<QTextCodec>
+ extern drawData drawdata[1024];
 viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::viewfiles)
 {
+    QTextCodec *code = QTextCodec::codecForName("UTF-8");
+        QTextCodec::setCodecForLocale(code);
     ui->setupUi(this);
     QStandardItemModel *model = new QStandardItemModel(this);
     zipfile.viewzip(zipfilename);
@@ -26,7 +30,7 @@ viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
     int j=0;
     int folderlength;
     QString foldername="_";
-    model->setHorizontalHeaderLabels(QStringList()<<"name"<<""<<" 压缩后大小 "<<" 类型 "<<" 压缩方式 ");
+    model->setHorizontalHeaderLabels(QStringList()<<"name"<<" 压缩前大小 "<<" 压缩后大小 "<<" 类型 "<<" 压缩方式 ");
     qDebug()<<"cp2";
     for(int i = 0;i<zipfile.filecount;i++)
     {
@@ -48,6 +52,8 @@ viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
         else if(str.startsWith(foldername))
         {
             qDebug()<<"file"<<i<<"is under a folder";
+            QStandardItem *item1 = new QStandardItem(QString::number(drawdata[i].uncompress_size));
+            model->setItem(i,1,item1);
             item[foldernum-1][i] = new QStandardItem(str.remove(0,folderlength));
             model->item(foldernum-1,0)->setChild(j++,0,item[foldernum-1][i]);
             std::string stdpath = str.toStdString();
@@ -67,8 +73,8 @@ viewfiles::viewfiles(char* zipfilename,QWidget *parent) :
             item->setIcon(icon);
         }
     }
-    ui->treeView->setModel(model);
 
+    ui->treeView->setModel(model);
     ui->treeView->expandAll();
 
 

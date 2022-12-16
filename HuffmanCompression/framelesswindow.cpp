@@ -13,8 +13,9 @@
 #include"mypushbutton.h"
 #include"viewfiles.h"
 #include<QFileDialog>
+#include<iostream>
 #include"compression.h"
-
+using namespace std;
 struct FramelessWindowPrivate {
     FramelessWindowPrivate(QWidget *contentWidget) : contentWidget(contentWidget) {}
 
@@ -58,26 +59,55 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
-        char ch[1024];
-        fileName.remove("file:///");
+        fileName.replace("file:///","*");
+        char ch[255][1024];
+        memset(ch,0,sizeof(ch));
+        //fileName.remove("file:///");
         qDebug()<<fileName;
         if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
+        std::string stdfilename = fileName.toStdString();
+        int order=stdfilename.find('*');
+        fileName = QString::fromStdString(stdfilename);
+        fileName.remove(0,1);
+        stdfilename = fileName.toStdString();
+        int i;
+        order=stdfilename.find("*");
+        for(i = 0;order<stdfilename.length();i++)
+        {
 
-
+            sprintf(test->filepath[i], "%s",(QString::fromStdString(stdfilename.substr(0,order)).remove('\n')).toStdString().data());
+            std::string str = stdfilename.substr(0,order);
+            int order2 =str.find_last_of("\\");
+            sprintf(test->filename[i], "%s",str.substr(order2+1,str.size()-order2-1).data());
+            fileName = QString::fromStdString(stdfilename);
+            fileName.remove(0,order+1);
+            stdfilename = fileName.toStdString();
+            order=stdfilename.find("*");
+            qDebug()<<"order: "<<order<<"order2: "<<order2;
+            qDebug()<<"path"<<i<<" :"<<test->filepath[i];
+            qDebug()<<"name"<<i<<" :"<<test->filename[i];
+        }
+        qDebug()<<QString::fromStdString(stdfilename)<<i;
+        int order2 =stdfilename.find_last_of("\\");
+        sprintf(test->filepath[i], "%s",(QString::fromStdString(stdfilename).remove('\n')).toStdString().data());
+        sprintf(test->filename[i], "%s",stdfilename.substr(order2+1,stdfilename.size()-order2-1).data());
+        qDebug()<<"path"<<i<<" :"<<test->filepath[i];
+        qDebug()<<"name"<<i<<" :"<<test->filename[i];
         QByteArray ba = fileName.toLatin1(); // must
-        sprintf(ch, "%s", ba.data());
+        //sprintf(ch, "%s", ba.data());
 
-        qDebug()<<ch;
+        //qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
+        savepath.append("\\\\1");
         savepath.append(".zip");
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
-
+        else return;
         QByteArray da = savepath.toLatin1(); // must
         char sh[1024];
         sprintf(sh, "%s", da.data());
         qDebug()<<sh;
-        //test->compressionOne(ch, sh, sh);
-        // must
+        test->compressionFile(sh,i+1);
+
     });
     newfile->show();
 
