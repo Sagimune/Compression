@@ -89,7 +89,9 @@ void Compression::Zip(QString path)
     HuffmanTree_Init();
     ZipPassword_Init(container.top(),"");
 
-    QFile savefile(path+".huffmanzip");
+    while(path.size()&&path.right(1)!='/') path.chop(1);
+    QFile savefile(path+"haffuman.tmp");
+
     savefile.open(QIODevice::WriteOnly);
     QDataStream out(&savefile);
     out<<(int)0;
