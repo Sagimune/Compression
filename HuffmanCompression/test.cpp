@@ -55,15 +55,18 @@ bool test::testNoCompression()
     char defile[] = "D:\\git\\test\\test1215.zip";
 
 
-    char dir[] = "D:\\git\\test\\include\\";
-    char outfile[] = "D:\\git\\test\\test1216.zip";
-
+    char outfile1[] = "D:\\git\\test\\test1216.zip";
     char onefilepath[] = "D:\\git\\test\\Test.txt";
     char onefilename[] = "Test.txt";
 
     sprintf(test->filepath[0], "%s", onefilepath);
     sprintf(test->filename[0], "%s", onefilename);
-    test->compressionFile(outfile, 1);
+    test->compressionFile(outfile1, 1);
+
+
+    char dir[] = "D:\\git\\test\\include\\";
+    char outfile2[] = "D:\\git\\test\\test1217.zip";
+    test->compressionDir(dir, outfile2);
 
     //char dir[] = "D:\\git\\test\\Test.txt";
     //char name[] = "Test.txt";
