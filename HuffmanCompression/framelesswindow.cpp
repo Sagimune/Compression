@@ -40,7 +40,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
 
     QLineEdit *pathedit = new QLineEdit(contentWidget);
     pathedit->setGeometry(5,345,300,40);
-    pathedit->setText("1.zip");
+    pathedit->setText("1.huffmanzip");
     pathedit->setStyleSheet("QLineEdit{border-radius:9px;}");
     mypushbutton *exit = new mypushbutton(":/new/prefix1/Resoures/close.png");
     exit->setGeometry(1160,0,25,25);
@@ -64,6 +64,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
+        if(fileName.isEmpty()) return;
         fileName.replace("file:///","*");
         char ch[255][1024];
         memset(ch,0,sizeof(ch));
@@ -105,9 +106,9 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
         savepath.append("\\\\");
         QString name = pathedit->text();
-        if(name.isEmpty()) name="1.zip";
+        if(name.isEmpty()) name="1.huffmanzip";
         savepath.append(name);
-        if(!name.endsWith(".zip")) savepath.append(".zip");
+        if(!name.endsWith(".huffmanzip")) savepath.append(".huffmanzip");
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
         else return;
         QByteArray da = savepath.toLatin1(); // must
@@ -125,7 +126,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     openfile->show();
     connect(openfile,&QPushButton::clicked,[=]()
     {
-        QString fileName = QFileDialog::getOpenFileName(this,tr(" 选择文件 "), "", tr("Text files (*.zip)"));
+        QString fileName = QFileDialog::getOpenFileName(this,tr(" 选择文件 "), "", tr("Text files (*.huffmanzip)"));
         char* ch;
         QByteArray ba = fileName.toLatin1(); // must
         ch=ba.data();
@@ -149,6 +150,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
+        if(fileName.isEmpty()) return;
         fileName.remove(0,8);
         char* ch;
         if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
@@ -157,7 +159,8 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
-
+        else return;
+        savepath =savepath+"\\\\";
         qDebug()<<savepath;
         QByteArray da = savepath.toLatin1(); // must
         char * sh;
