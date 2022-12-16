@@ -14,6 +14,7 @@
 #include"viewfiles.h"
 #include<QFileDialog>
 #include<iostream>
+#include<QLineEdit>
 #include"compression.h"
 using namespace std;
 struct FramelessWindowPrivate {
@@ -37,6 +38,10 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     text->show();
     text->setStyleSheet("QTextEdit{border-radius:9px;}");
 
+    QLineEdit *pathedit = new QLineEdit(contentWidget);
+    pathedit->setGeometry(5,345,300,40);
+    pathedit->setText("1.zip");
+    pathedit->setStyleSheet("QLineEdit{border-radius:9px;}");
     mypushbutton *exit = new mypushbutton(":/new/prefix1/Resoures/close.png");
     exit->setGeometry(1160,0,25,25);
     exit->setParent(contentWidget);
@@ -53,7 +58,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
 
 
     mypushbutton *newfile = new mypushbutton(":/new/prefix1/Resoures/newfile.png");
-    newfile->setGeometry(250,350,25,30);
+    newfile->setGeometry(250,400,25,30);
     newfile->setParent(contentWidget);
     connect(newfile,&QPushButton::clicked,[=]()
     {
@@ -98,8 +103,11 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
 
         //qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
-        savepath.append("\\\\1");
-        savepath.append(".zip");
+        savepath.append("\\\\");
+        QString name = pathedit->text();
+        if(name.isEmpty()) name="1.zip";
+        savepath.append(name);
+        if(!name.endsWith(".zip")) savepath.append(".zip");
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
         else return;
         QByteArray da = savepath.toLatin1(); // must
@@ -112,7 +120,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     newfile->show();
 
     mypushbutton *openfile = new mypushbutton(":/new/prefix1/Resoures/openfile.jpg");
-    openfile->setGeometry(700,350,25,30);
+    openfile->setGeometry(700,400,25,30);
     openfile->setParent(contentWidget);
     openfile->show();
     connect(openfile,&QPushButton::clicked,[=]()
@@ -135,17 +143,17 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         contentWidget->lower();
     });
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
-    jieya->setGeometry(475,350,25,30);
+    jieya->setGeometry(475,400,25,30);
     jieya->setParent(contentWidget);
     connect(jieya,&QPushButton::clicked,[=]()
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
+        fileName.remove(0,8);
         char* ch;
         if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
         QByteArray ba = fileName.toLatin1(); // must
-        ch=ba.data();
-
+        ch=ba.data();  //  zip文件路径
         qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
@@ -179,10 +187,10 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
             contentWidget->showNormal();
             exit->setGeometry(1160,0,25,25);
             zuidahua->setGeometry(1135,0,25,25);
-            newfile->setGeometry(250,350,25,30);
-            openfile->setGeometry(700,350,25,30);
+            newfile->setGeometry(250,400,25,30);
+            openfile->setGeometry(700,400,25,30);
             zuixiaohua->setGeometry(1110,0,25,25);
-            jieya->setGeometry(475,350,25,30);
+            jieya->setGeometry(475,400,25,30);
             text->setGeometry(5,30,1180,300);
             i++;
         }

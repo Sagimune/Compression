@@ -345,8 +345,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
     viewzip(zipfilename);
 
     FILE *zipfile = fopen(zipfilename, "rb");
-
-    //localFile
+    qDebug()<<filecount;
     fseek(zipfile, 0, SEEK_SET);
     for(int i = 0; i < filecount; i ++ )
     {
@@ -380,7 +379,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
     }
 
     fclose(zipfile);
-
+    qDebug()<<"unzip done";
     return true;
 }
 
