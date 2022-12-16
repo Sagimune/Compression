@@ -38,8 +38,8 @@ public:
     QWORD gettime();
     DWORD crc32(DWORD crc, const char *buf, int len);
     BYTE* doCompress(int &outlen, char* infilepath);
-    DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &datalen);
-    DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset);
+    DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &compress_size, int &uncompress_size);
+    DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int compress_size, int uncompress_size, DWORD crc_32, DWORD offset);
     void compressionDir(char* dir, char* outfile);
     void compressionFile(char* outfile, int infilecount);
 
