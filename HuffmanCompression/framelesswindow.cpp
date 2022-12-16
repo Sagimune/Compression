@@ -58,14 +58,14 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
-        char* ch;
+        char ch[1024];
         fileName.remove("file:///");
         qDebug()<<fileName;
         if (!fileName.isEmpty())fileName = fileName.replace(QRegExp("/"), "\\\\");
 
 
         QByteArray ba = fileName.toLatin1(); // must
-        ch=ba.data();
+        sprintf(ch, "%s", ba.data());
 
         qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
@@ -73,10 +73,10 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         if (!savepath.isEmpty())savepath = savepath.replace(QRegExp("/"), "\\\\");
 
         QByteArray da = savepath.toLatin1(); // must
-        char * sh;
-        sh=da.data();
+        char sh[1024];
+        sprintf(sh, "%s", da.data());
         qDebug()<<sh;
-        test->compression(ch,sh,0);
+        //test->compressionOne(ch, sh, sh);
         // must
     });
     newfile->show();

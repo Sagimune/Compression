@@ -7,6 +7,7 @@ zipcompression::zipcompression()
 {
     memset(drawdata, 0, sizeof(drawdata));
     memset(filename, 0, sizeof(filename));
+    tool = new Compression;
 }
 
 bool zipcompression::ListDirectoryContents(const char *sDir, int len)
@@ -32,12 +33,12 @@ bool zipcompression::ListDirectoryContents(const char *sDir, int len)
 
             if(fdFile.dwFileAttributes &FILE_ATTRIBUTE_DIRECTORY)
             {
-                //printf("%s\\\n", sPath + len);
+                printf("%s\\\n", sPath + len);
                 sprintf(filename[filecount ++], "%s\\", sPath + len);
                 ListDirectoryContents(sPath, len);
             }
             else{
-                //printf("%s\n", sPath + len);
+                printf("%s\n", sPath + len);
                 sprintf(filename[filecount ++], "%s", sPath + len);
             }
         }
@@ -77,7 +78,7 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
         fclose(file);
 
         //motify outlen & data
-        out = doCompress(data, inlen, outlen, method);
+        out = doCompress(data, inlen, outlen, 0);
 
         crc_32 = crc32(0, (char*)data, inlen);
         lf1.crc_32 = crc_32;
@@ -99,6 +100,7 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
     fwrite(&lf1, sizeof(lf1), 1, output);
 
     //输出文件名
+    for(int i = 0; i < strlen(infilename); i ++ ) if(infilename[i] == '\\') infilename[i] = '/';
     fputs(infilename, output);
 
     //输出压缩数据
@@ -128,6 +130,7 @@ DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int m
     cdh1.relative_offset_of_local_header = offset;
 
     fwrite(&cdh1, sizeof(cdh1), 1, output);
+    for(int i = 0; i < strlen(infilename); i ++ ) if(infilename[i] == '\\') infilename[i] = '/';
     fputs(infilename, output);
 
     //NTFC_TIME
@@ -147,80 +150,7 @@ BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int metho
 {
     if(method == 8)
     {
-        Compression tool;
-        LZSS *test = new LZSS((BYTE*)stream, inlen);
-        lzss_result *result = test->dolzss();
-        qDebug() << "doCompress: LZSS count";
-        qDebug() << result->src_result[0];
-        qDebug() << result->LL_result[0];
-        qDebug() << result->Distance_result[0];
 
-        huffman_result* LL_huffman = tool.ziphuffman_encode(result->LL_result + 1, result->LL_result[0]);
-        huffman_result* Dist_huffman = tool.ziphuffman_encode(result->Distance_result + 1, result->Distance_result[0]);
-        for(int i = 0; i < Dist_huffman->outlen; i ++ )
-        {
-            ComparisonNode *data = &Dist_huffman->ComNodeOut[i];
-            if(data->Len)
-            {
-                std::string str = (data->Code).to_string();
-                qDebug() << data->C << " : " << data->Len << " : " << QString::fromStdString(str);
-            }
-        }
-
-        //change code with LLresult->src_result  ----> get sourcecode
-
-        //codelength LL & Dist (cat) & pass 0 end
-        int LL_codelength[287];
-        memset(LL_codelength, 0, sizeof(LL_codelength));
-        for(int i = 0; i < LL_huffman->outlen; i ++ )
-        {
-            ComparisonNode *data = &LL_huffman->ComNodeOut[i];
-            LL_codelength[data->C] = data->Len;
-        }
-        int outlen = 0;
-        int *CLL = clcodeEncode(LL_codelength, 286, outlen);
-        for(int i = 0; i < outlen; i ++ )
-        {
-            qDebug() << CLL[i];
-        }
-
-        qDebug() << "-------------------------------------------";
-
-        int Dist_codelength[31];
-        memset(Dist_codelength, 0, sizeof(Dist_codelength));
-        for(int i = 0; i < Dist_huffman->outlen; i ++ )
-        {
-            ComparisonNode *data = &Dist_huffman->ComNodeOut[i];
-            Dist_codelength[data->C] = data->Len;
-            std::string str = (data->Code).to_string();
-            qDebug() << data->C << " : " << data->Len << " : " << QString::fromStdString(str);
-        }
-        int outlen2 = 0;
-        int *CDist = clcodeEncode(Dist_codelength, 30, outlen2);
-        for(int i = 0; i < outlen2; i ++ )
-        {
-            qDebug() << CDist[i];
-        }
-
-        //CL do huffman
-
-        //sort CCL
-
-        //writefile
-
-        //IS_LAST BTYPE HLIT HDIST HCLEN
-
-        //CCL
-
-        //LL code
-
-        //Distance code
-
-        //Source code
-
-
-        outlen = inlen;
-        return stream;
     }
     else
     {
@@ -230,7 +160,11 @@ BYTE* zipcompression::doCompress(BYTE* stream, int inlen, int &outlen, int metho
     return NULL;
 }
 
-void zipcompression::compression(char* dir, char* outfile, int method)
+//0 : one file
+//1 : multi file
+//2 : dir
+//dir: 文件所在
+void zipcompression::compressionDir(char* dir, char* outfile)
 {
     filecount = 0;
     ListDirectoryContents(dir, strlen(dir));
@@ -238,6 +172,7 @@ void zipcompression::compression(char* dir, char* outfile, int method)
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
     DWORD lfsize, cdsize, crc_32, offset;
+    lfsize = cdsize = crc_32 = offset = 0;
     int datalen;
 
     offset = 0;
@@ -245,8 +180,8 @@ void zipcompression::compression(char* dir, char* outfile, int method)
     {
         char filepath[1024];
         sprintf(filepath, "%s%s", dir, filename[i] + 1);
-        lfsize += pack_onefileheader(filepath, filename[i] + 1, method, output, crc_32, datalen);
-        cdsize += pack_onecdheader(filepath, filename[i] + 1, method, tmpcdfile, datalen, crc_32, offset);
+        lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, datalen);
+        cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, datalen, crc_32, offset);
         offset = lfsize;
     }
     gfilecount = filecount;
@@ -273,9 +208,9 @@ void zipcompression::compression(char* dir, char* outfile, int method)
     fclose(output);
 }
 
-void zipcompression::compressionOne(char* dir, char* name, char* outfile, int method)
+void zipcompression::compressionFile(char* outfile, int infilecount)
 {
-    filecount = 1;
+    filecount = infilecount;
 
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
@@ -283,10 +218,12 @@ void zipcompression::compressionOne(char* dir, char* name, char* outfile, int me
     int datalen;
 
     lfsize = cdsize = crc_32 = offset = 0;
-    lfsize += pack_onefileheader(dir, name, method, output, crc_32, datalen);
-    cdsize += pack_onecdheader(dir, name, method, tmpcdfile, datalen, crc_32, offset);
-    offset = lfsize;
-
+    for(int i = 0; i < filecount; i ++ )
+    {
+        lfsize += pack_onefileheader(filepath[i], filename[i], 0, output, crc_32, datalen);
+        cdsize += pack_onecdheader(filepath[i], filename[i], 0, tmpcdfile, datalen, crc_32, offset);
+        offset = lfsize;
+    }
 
     fclose(tmpcdfile);
     tmpcdfile = fopen("tmp.tmp", "r");
@@ -309,6 +246,7 @@ void zipcompression::compressionOne(char* dir, char* name, char* outfile, int me
 
     fclose(output);
 }
+
 
 
 BYTE* zipcompression::doDecompress(BYTE* stream, int inlen, int &outlen, int method)
@@ -461,66 +399,4 @@ DWORD zipcompression::crc32(DWORD crc, const char *buf, int len)
         crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
     }
     return ~crc;
-}
-
-int* zipcompression::clcodeEncode(int *stream, int inlen, int& outlen)
-{
-    outlen = 0;
-    if(inlen < 3)
-    {
-        outlen = inlen;
-        return stream;
-    }
-    int count = 0;
-    stream[inlen] = 99;
-    inlen ++;
-    for(int i = 0; i < inlen - 1; i ++)
-    {
-        clcode_out[outlen ++] = stream[i];
-        if(stream[i] == stream[i+1] && (count + 1 <= 137))
-        {
-            count ++;
-        }
-        else
-        {   //count + 1; repeat
-            if(count + 1 >= 3)
-            {
-                if(stream[i] == 0 && count + 1 <= 10)
-                {
-                    outlen -= count + 1;
-                    clcode_out[outlen ++] = 17;
-                    clcode_out[outlen ++] = count+1 - 3;
-                }
-                else if(stream[i] == 0 && count + 1 >= 11)
-                {
-                    outlen -= count + 1;
-                    clcode_out[outlen ++] = 18;
-                    clcode_out[outlen ++] = count+1 - 11;
-                }
-                else if(count + 1 >= 4)
-                {
-                    outlen -= count + 1;
-                    clcode_out[outlen ++] = stream[i];
-                    while(count >= 6)
-                    {
-                        clcode_out[outlen ++] = 16;
-                        clcode_out[outlen ++] = 3;
-                        count -= 6;
-                    }
-                    if(count >= 3)
-                    {
-                        clcode_out[outlen ++] = 16;
-                        clcode_out[outlen ++] = count - 3;
-                    }
-                    else
-                    {
-                        for(int j = 0; j < count; j ++ ) clcode_out[outlen ++] = stream[i];
-                    }
-                }
-            }
-            count = 0;
-        }
-    }
-
-    return clcode_out;
 }

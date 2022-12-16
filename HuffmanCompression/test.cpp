@@ -9,7 +9,6 @@ test::test()
     //flag |= testQByteArray2QString();
     //flag |= testLZSS();
     flag |= testNoCompression();
-    //flag |= testCLCode();
 
     if(flag)
         qDebug() << "测试通过 ";
@@ -50,49 +49,29 @@ bool test::testNoCompression()
 {
     zipcompression *test = new zipcompression;
 
-    //char dir[] = "D:\\git\\test\\include\\";
+
 
     char dedir[] = "D:\\git\\test\\testde\\";
     char defile[] = "D:\\git\\test\\test1215.zip";
 
 
-
+    char dir[] = "D:\\git\\test\\include\\";
     char outfile[] = "D:\\git\\test\\test1216.zip";
-    char dir[] = "D:\\git\\test\\Test.txt";
-    char name[] = "Test.txt";
-    test->compressionOne(dir, name, outfile, 8);
-    //test->compressionOne(dir, name, outfile, 8);
+
+    char onefilepath[] = "D:\\git\\test\\Test.txt";
+    char onefilename[] = "Test.txt";
+
+    sprintf(test->filepath[0], "%s", onefilepath);
+    sprintf(test->filename[0], "%s", onefilename);
+    test->compressionFile(outfile, 1);
+
+    //char dir[] = "D:\\git\\test\\Test.txt";
+    //char name[] = "Test.txt";
+    //test->compressionOne(dir, name, outfile, 0);
+
     //test->viewzip(defile);
     //test->decompress(defile, dedir);
 
-    //for(int i = 0; i < gfilecount; i ++ )
-    //{
-    //    qDebug() << i << ": "<< drawdata[i].filename;
-    //}
-
-
-    return true;
-}
-
-bool test::testCLCode()
-{
-    zipcompression *test = new zipcompression;
-
-    int llcode[286];
-    memset(llcode, 0, sizeof(llcode));
-
-    llcode[32] = llcode[65] = 4;
-    for(int i = 66; i <= 69; i ++ ) llcode[i] = 3;
-    llcode[256] = llcode[258] = llcode[263] = 3;
-
-    int outlen = 0;
-    int *outstream = test->clcodeEncode(llcode, 285, outlen);
-    for(int i = 0; i < outlen; i ++ )
-    {
-        qDebug() << outstream[i];
-    }
-
-    qDebug() << "CLCodeEncode测试完毕";
 
     return true;
 }

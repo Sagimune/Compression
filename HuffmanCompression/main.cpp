@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     window->show();
     // 创建包含主要控件的 Widget
 
-   // test();
+    test();
 
     return app.exec();
 }

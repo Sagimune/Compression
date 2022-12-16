@@ -12,6 +12,7 @@
 #define MAXLZSW         32768
 #define MINLZLEN        3
 #define BLOCKSIZE       16383
+#define TMPNAME         "tmp"
 
 struct ComparisonNode
 {

@@ -27,10 +27,12 @@ public:
 
     int filecount;
     char filename[1024][255];
+    char filepath[1024][255];
 
     DWORD cdoffset;
 
     int clcode_out[BLOCKSIZE*4];
+    Compression *tool;
 
     bool ListDirectoryContents(const char *sDir, int len);
     QWORD gettime();
@@ -38,14 +40,14 @@ public:
     BYTE* doCompress(BYTE* stream, int inlen, int &outlen, int method);
     DWORD pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &datalen);
     DWORD pack_onecdheader(char* infilepath, char* infilename, int method, FILE* output, int datalen, DWORD crc_32, DWORD offset);
-    void compression(char* dir, char* outfile, int method);
-    void compressionOne(char* dir, char* name, char* outfile, int method);
+    void compressionDir(char* dir, char* outfile);
+    void compressionFile(char* outfile, int infilecount);
 
     BYTE* doDecompress(BYTE* stream, int inlen, int &outlen, int method);
     bool viewzip(char *zipfilename);
     bool decompress(char *zipfilename, char* where);
 
-    int* clcodeEncode(int *stream, int inlen, int& outlen);
+    void compressCtrl(char* outfile);
 
 };
 
