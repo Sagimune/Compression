@@ -142,7 +142,7 @@ void Compression::Zip(QString path)
 
 void Compression::UnZip(QString path)
 {
-    if(path.right(11)!=".huffmanzip")
+    if(path.right(13)!="haffuman2.tmp")//if(path.right(11)!=".huffmanzip")
     {
         QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件 "));
         return;
@@ -171,9 +171,12 @@ void Compression::UnZip(QString path)
     Container_Init();
     HuffmanTree_Init();
 
-    path.chop(11);
-    path.insert(path.lastIndexOf('.'),"(NEW)");
-    QFile savefile(path);
+    //path.chop(11);
+    //path.insert(path.lastIndexOf('.'),"(NEW)");
+    //QFile savefile(path);
+    path.chop(13);
+    QFile savefile(path+"haffuman3.tmp");
+
     savefile.open(QIODevice::WriteOnly);
     QDataStream out(&savefile);
     Node *x = container.top();
