@@ -41,6 +41,10 @@ protected:
     void Container_Init();
     void HuffmanTree_Init();
     void ZipPassword_Init(Node *root, std::string password);
+signals:
+    void error();
+    void mysignal(double per);
+public slots:
 };
 
 #endif // COMPRESSION_H
