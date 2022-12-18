@@ -168,7 +168,13 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         sh=da.data();
         qDebug()<<sh;
         test->decompress(ch,sh);
+        QMessageBox::information(this,
+            tr(" Decompression completed "),
+            tr(" Decompression completed "),
+            QMessageBox::Ok | QMessageBox::Cancel,
+            QMessageBox::Ok);
         text->clear();
+
         // must
     });
     connect(zuidahua,&QPushButton::clicked,[=]()
