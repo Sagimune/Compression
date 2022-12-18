@@ -167,12 +167,13 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         char * sh;
         sh=da.data();
         qDebug()<<sh;
+        QWidget* decompression = new QWidget;
+        decompression->resize(640,360);
+
+        decompression->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+        decompression->show();
         test->decompress(ch,sh);
-        QMessageBox::information(this,
-            tr(" Decompression completed "),
-            tr(" Decompression completed "),
-            QMessageBox::Ok | QMessageBox::Cancel,
-            QMessageBox::Ok);
+
         text->clear();
 
         // must
