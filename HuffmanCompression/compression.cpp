@@ -72,22 +72,29 @@ void Compression::ZipPassword_Init(Node *x, std::string s)
 
 void Compression::Zip(QString path)
 {
+    emit mysignal(0);
     QFile openfile(path);
     if(!openfile.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
+        emit error();
         return;
     }
     if(openfile.size()==0)
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
+        emit error();
         return;
     }
     clock_t Begin = clock();
     Weightmap_Init(openfile);
+    emit mysignal(10);
     Container_Init();
+    emit mysignal(20);
     HuffmanTree_Init();
+    emit mysignal(30);
     ZipPassword_Init(container.top(),"");
+    emit mysignal(40);
 
     while(path.size()&&path.right(1)!='/') path.chop(1);
     QFile savefile(path+"haffuman.tmp");
@@ -98,11 +105,13 @@ void Compression::Zip(QString path)
     out<<(weightmap.size()==256 ? 0 : weightmap.size());
     for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
         out<<it.key()<<it.value();
-
+    emit mysignal(50);
     openfile.seek(0);
     QByteArray a;
     unsigned char ch = 0;
     int num = 0;
+    double Total = 1024.0/8/openfile.size();
+    int ci = 0;
     while(!openfile.atEnd())
     {
         a = openfile.read(1024);
@@ -121,6 +130,7 @@ void Compression::Zip(QString path)
                 }
             }
         }
+        emit mysignal(50+50.0*((ci++)*Total));
     }
     if(num)
     {
@@ -132,33 +142,41 @@ void Compression::Zip(QString path)
     openfile.close();
     savefile.close();
 
-    qDebug()<<"ZipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
-
     DEL(container.top());
     container.pop();
     weightmap.clear();
     passwordmap.clear();
+
+    emit mysignal(100);
+
+    qDebug()<<"ZipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
 }
 
 void Compression::UnZip(QString path)
 {
+    emit mysignal(0);
     if(path.right(13)!="haffuman2.tmp")//if(path.right(11)!=".huffmanzip")
     {
         QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件 "));
+        emit error();
         return;
     }
     QFile openfile(path);
     if(!openfile.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败 "));
+        emit error();
         return;
     }
     if(openfile.size()==0)
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
+        emit error();
         return;
     }
 
+
+    double Total = openfile.size();
     clock_t Begin = clock();
     QDataStream in(&openfile);
     int Num; in>>Num;
@@ -168,8 +186,12 @@ void Compression::UnZip(QString path)
         unsigned char ch; in>>ch;
         in>>weightmap[ch];
     }
+    Total -= 4+n;
+    emit mysignal(10);
     Container_Init();
+    emit mysignal(20);
     HuffmanTree_Init();
+    emit mysignal(30);
 
     //path.chop(11);
     //path.insert(path.lastIndexOf('.'),"(NEW)");
@@ -180,6 +202,7 @@ void Compression::UnZip(QString path)
     savefile.open(QIODevice::WriteOnly);
     QDataStream out(&savefile);
     Node *x = container.top();
+    double ci = 0;
     while(!in.atEnd())
     {
         unsigned char ch; in>>ch;
@@ -194,13 +217,16 @@ void Compression::UnZip(QString path)
                 x = container.top();
             }
         }
+        emit mysignal(30+70*(ci++)/Total);
     }
     openfile.close();
     savefile.close();
 
-    qDebug()<<"UnzipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
-
     DEL(container.top());
     container.pop();
     weightmap.clear();
+
+    emit mysignal(100);
+
+    qDebug()<<"UnzipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
 }
