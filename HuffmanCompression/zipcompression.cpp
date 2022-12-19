@@ -72,6 +72,11 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
 
         BYTE data[BLOCKSIZE];
         FILE* file = fopen(infilepath, "rb");
+        if(!file)
+        {
+            qDebug() << "pack_onefileheader: file not found.  path: " << infilepath;
+            return 0;
+        }
 
         //motify inlen & data
         uncompress_size = fread(&data, sizeof(BYTE), BLOCKSIZE, file);
@@ -179,6 +184,11 @@ BYTE* zipcompression::doCompress(int &outlen, char* infilepath)
 
     //获取结果文件，获取文件大小，new一个字节流，写入，设定返回大小，关闭，删除文件，返回字节流
     FILE *compresstmp = fopen("haffuman.tmp", "rb");
+    if(!compresstmp)
+    {
+        qDebug() << "doCompress: file not found.  path: haffuman.tmp";
+    }
+
     int filesize = get_file_size(compresstmp);
     BYTE *data = new BYTE[filesize];
 
@@ -198,6 +208,16 @@ void zipcompression::compressionDir(char* dir, char* outfile)
 
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
+    if(!output)
+    {
+        qDebug() << "compressDir: file not found.  path: " << outfile;
+        return;
+    }
+    if(!tmpcdfile)
+    {
+        qDebug() << "compressDir: file not found.  path: " << "tmp.tmp";
+        return;
+    }
     DWORD lfsize, cdsize, crc_32, offset;
     lfsize = cdsize = crc_32 = offset = 0;
     int compress_size = 0;
@@ -216,6 +236,11 @@ void zipcompression::compressionDir(char* dir, char* outfile)
 
     fclose(tmpcdfile);
     tmpcdfile = fopen("tmp.tmp", "r");
+    if(!tmpcdfile)
+    {
+        qDebug() << "compressDir: file not found.  path: " << "tmp.tmp";
+        return;
+    }
 
     while(!feof(tmpcdfile))
     {
@@ -242,6 +267,16 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
 
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
+    if(!output)
+    {
+        qDebug() << "compressionFile: file not found.  path: " << outfile;
+        return;
+    }
+    if(!tmpcdfile)
+    {
+        qDebug() << "compressionFile: file not found.  path: " << "tmp.tmp";
+        return;
+    }
     DWORD lfsize, cdsize, crc_32, offset;
     int compress_size = 0;
     int uncompress_size = 0;
@@ -256,13 +291,21 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
 
     fclose(tmpcdfile);
     tmpcdfile = fopen("tmp.tmp", "r");
+    if(!tmpcdfile)
+    {
+        qDebug() << "compressionFile: file not found.  path: " << "tmp.tmp";
+        return;
+    }
 
+    int cnt = 0;
     while(!feof(tmpcdfile))
     {
         char ch = fgetc(tmpcdfile);
-        if(ch == EOF) break;
+        if(feof(tmpcdfile)) break;
+        cnt ++;
         fprintf(output, "%c", ch);
     }
+    qDebug() << "output " << cnt << " byte cdheader";
     remove("tmp.tmp");
 
     //ECDrecord
@@ -280,6 +323,11 @@ BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
 {
     //分解文件头，zipfile输出inlen个字节
     FILE *decompresstmp = fopen("haffuman2.tmp", "wb");
+    if(!decompresstmp)
+    {
+        qDebug() << "doDecompress: file not fouond.  path:" << "haffuman2.tmp";
+        return NULL;
+    }
 
     for(int i = 0; i < inlen; i ++ )
     {
@@ -292,12 +340,18 @@ BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
 
     //获取解压缩结果文件，获取大小，new一个字节流，读进去，设定返回大小，关闭文件，删除文件，返回文件流
     FILE *decompresstmp2 = fopen("haffuman3.tmp", "rb");
+    if(!decompresstmp2)
+    {
+        qDebug() << "doDecompress: file not fouond.  path:" << "haffuman3.tmp";
+        return NULL;
+    }
+
     int filesize = get_file_size(decompresstmp2);
     BYTE *data = new BYTE[filesize];
 
     fread(data, sizeof(BYTE), filesize, decompresstmp2);
     fclose(decompresstmp2);
-    remove("haffuman3.tmp");
+    //remove("haffuman3.tmp");
 
     outlen = filesize;
     return data;
@@ -307,6 +361,11 @@ bool zipcompression::viewzip(char *zipfilename)
 {
     memset(filename, 0, sizeof(filename));
     FILE *zipfile = fopen(zipfilename, "rb");
+    if(!zipfile)
+    {
+        qDebug() << "viewzip: file not found.  path: " << zipfilename;
+        return 0;
+    }
 
     //ECDrecord
     BYTE tmp[sizeof(ECDrecord)];
@@ -345,6 +404,11 @@ bool zipcompression::decompress(char *zipfilename, char* where)
     viewzip(zipfilename);
 
     FILE *zipfile = fopen(zipfilename, "rb");
+    if(!zipfile)
+    {
+        qDebug() << "decompress: file not found.  path: " << zipfilename;
+        return 0;
+    }
     qDebug()<<filecount;
     fseek(zipfile, 0, SEEK_SET);
     for(int i = 0; i < filecount; i ++ )
