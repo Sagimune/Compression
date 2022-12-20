@@ -64,6 +64,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
     {
         zipcompression *test = new zipcompression;
         QString fileName = text->toPlainText();
+        fileName.remove("\n");
         if(fileName.isEmpty()) return;
         fileName.replace("file:///","*");
         char ch[255][1024];

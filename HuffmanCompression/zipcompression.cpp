@@ -486,6 +486,13 @@ bool zipcompression::decompress(char *zipfilename, char* where)
             BYTE *out = doDecompress(zipfile, datasize, outlen);
 
             FILE *outfile = fopen(onefilepath, "wb");
+            qDebug()<<"onefilepath"<<onefilepath;
+            if(!outfile)
+            {
+                qDebug() << "deCompress: file cannot open: " << onefilepath;
+                return 0;
+            }
+
             fwrite(out, sizeof(BYTE), outlen, outfile);
             fclose(outfile);
         }
