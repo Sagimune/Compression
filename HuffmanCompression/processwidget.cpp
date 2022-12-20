@@ -24,11 +24,20 @@ processwidget::~processwidget()
 }
 
 
-void processwidget::init()
+void processwidget::init(int method)
 {
     ui->fileprocess->setValue(0);
     ui->allprocess->setValue(0);
     ui->frame->hide();
+
+    if(method == 0)
+    {
+        ui->label_3->setText(QString("压缩时间"));
+    }
+    else if(method == 1)
+    {
+        ui->label_3->setText(QString("解压时间"));
+    }
 }
 
 void processwidget::finish(double alltime, double compressrate)
@@ -45,7 +54,7 @@ void processwidget::finish(double alltime, double compressrate)
 
 void processwidget::on_finish_clicked()
 {
-    this->init();
+    this->init(0);
     this->hide();
 }
 

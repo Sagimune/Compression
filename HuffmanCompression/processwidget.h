@@ -16,7 +16,7 @@ public:
     explicit processwidget(QWidget *parent = nullptr);
     ~processwidget();
 
-    void init();
+    void init(int method);
     void finish(double alltime, double compressrate);
 
 public slots:

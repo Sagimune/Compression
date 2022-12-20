@@ -239,7 +239,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
     double processstep = 100 / filecount;
     alltime = allcompress = alluncompress = 0.0;
     pwidget->show();
-    pwidget->init();
+    pwidget->init(0);
     for(int i = 0; i < filecount; i ++ )
     {
         char filepath[1024];
@@ -311,7 +311,7 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     double processvalue = 0;
     double processstep = 100 / filecount;
     alltime = allcompress = alluncompress = 0.0;
-    pwidget->init();
+    pwidget->init(0);
     pwidget->show();
     for(int i = 0; i < filecount; i ++ )
     {
@@ -454,7 +454,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
     qDebug()<<filecount;
     double processvalue = 0;
     double processstep = 100.0 / filecount;
-    pwidget->init();
+    pwidget->init(1);
     pwidget->show();
     fseek(zipfile, 0, SEEK_SET);
     for(int i = 0; i < filecount; i ++ )
