@@ -56,6 +56,10 @@ public:
     double allcompress;
     double alluncompress;
 
+signals:
+    void onefilecomp(double value);
+
+
 };
 
 #endif // ZIPCOMPRESSION_H

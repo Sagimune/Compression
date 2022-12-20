@@ -10,9 +10,8 @@ zipcompression::zipcompression()
     tool = new Compression;
     pwidget = new processwidget;
 
-    connect(tool, SIGNAL(tool->mysignal(double)), pwidget, SLOT(pwidget->movefileprocess(double)));
-    //connect(tool, SIGNAL(tool->mysignal(double)), this, SLOT(movefileprocess(double)));
-    //connect(this, SIGNAL(onefilecomp(double)), this, SLOT(moveallprocess(double)));
+    connect(tool, SIGNAL(mysignal(double)), pwidget, SLOT(movefileprocess(double)));
+    connect(this, SIGNAL(onefilecomp(double)), pwidget, SLOT(moveallprocess(double)));
 }
 
 bool zipcompression::ListDirectoryContents(const char *sDir, int len)
@@ -248,7 +247,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
         alluncompress += uncompress_size;
 
         processvalue += processstep;
-        emit pwidget->onefilecomp(processvalue);
+        emit onefilecomp(processvalue);
     }
     gfilecount = filecount;
 
@@ -318,7 +317,7 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
         alluncompress += uncompress_size;
 
         processvalue += processstep;
-        emit pwidget->onefilecomp(processvalue);
+        emit onefilecomp(processvalue);
     }
 
     fclose(tmpcdfile);
@@ -485,7 +484,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
         }
 
         processvalue += processstep;
-        emit pwidget->onefilecomp(processvalue);
+        emit onefilecomp(processvalue);
     }
 
     fclose(zipfile);

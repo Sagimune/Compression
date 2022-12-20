@@ -24,9 +24,6 @@ public slots:
     void movefileprocess(double value);
     void moveallprocess(double value);
 
-signals:
-    void onefilecomp(double value);
-
 private:
     Ui::processwidget *ui;
 

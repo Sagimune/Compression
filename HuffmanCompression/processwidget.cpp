@@ -52,8 +52,10 @@ void processwidget::on_finish_clicked()
 void processwidget::movefileprocess(double value)
 {
     qDebug() << "recv fileprocess value: " << value;
+    ui->fileprocess->setValue(value);
 }
 void processwidget::moveallprocess(double value)
 {
     qDebug() << "recv allprocess value: " << value;
+    ui->allprocess->setValue(value);
 }
