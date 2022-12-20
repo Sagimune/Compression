@@ -33,8 +33,8 @@ private:
     QMap<unsigned char,std::string> passwordmap;
 public:
     Compression();
-    void Zip(QString path);
-    void UnZip(QString path);
+    double Zip(QString path);
+    double UnZip(QString path);
 protected:
     void DEL(Node* root);
     void Weightmap_Init(QFile& in);
