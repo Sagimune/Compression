@@ -55,13 +55,6 @@ public:
     double allcompress;
     double alluncompress;
 
-public slots:
-    void movefileprocess(double value);
-    void moveallprocess(double value);
-
-signals:
-    void onefilecomp(double value);
-
 };
 
 #endif // ZIPCOMPRESSION_H

@@ -10,7 +10,7 @@ zipcompression::zipcompression()
     tool = new Compression;
     pwidget = new processwidget;
 
-    //connect(tool, SIGNAL(mysignal(double)), this, SLOT(movefileprocess(double)));
+    //connect(tool, SIGNAL(tool->mysignal(double)), pwidget, SLOT(pwidget->movefileprocess(double)));
     //connect(tool, SIGNAL(tool->mysignal(double)), this, SLOT(movefileprocess(double)));
     //connect(this, SIGNAL(onefilecomp(double)), this, SLOT(moveallprocess(double)));
 }
@@ -235,6 +235,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
     double processstep = 100 / filecount;
     alltime = allcompress = alluncompress = 0.0;
     pwidget->show();
+    pwidget->init();
     for(int i = 0; i < filecount; i ++ )
     {
         char filepath[1024];
@@ -244,12 +245,10 @@ void zipcompression::compressionDir(char* dir, char* outfile)
         offset = lfsize;
 
         allcompress += compress_size;
-        alluncompress == uncompress_size;
+        alluncompress += uncompress_size;
 
         processvalue += processstep;
-        emit onefilecomp(processvalue);
-
-        if(i == filecount - 1) emit onefilecomp(100.0);
+        emit pwidget->onefilecomp(processvalue);
     }
     gfilecount = filecount;
 
@@ -278,6 +277,8 @@ void zipcompression::compressionDir(char* dir, char* outfile)
     fwrite(&footer, sizeof(footer), 1, output);
 
     fclose(output);
+
+    pwidget->finish(alltime, allcompress / alluncompress);
 }
 
 void zipcompression::compressionFile(char* outfile, int infilecount)
@@ -305,6 +306,7 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     double processvalue = 0;
     double processstep = 100 / filecount;
     alltime = allcompress = alluncompress = 0.0;
+    pwidget->init();
     pwidget->show();
     for(int i = 0; i < filecount; i ++ )
     {
@@ -313,12 +315,10 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
         offset = lfsize;
 
         allcompress += compress_size;
-        alluncompress == uncompress_size;
+        alluncompress += uncompress_size;
 
         processvalue += processstep;
-        emit onefilecomp(processvalue);
-
-        if(i == filecount - 1) emit onefilecomp(100.0);
+        emit pwidget->onefilecomp(processvalue);
     }
 
     fclose(tmpcdfile);
@@ -350,7 +350,7 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
 
     fclose(output);
 
-
+    pwidget->finish(alltime, allcompress / alluncompress);
 }
 
 BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
@@ -370,7 +370,7 @@ BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
     }
     //关闭，将文件转交哈夫曼解压缩
     fclose(decompresstmp);
-    tool->UnZip(QString("haffuman2.tmp"));
+    alltime += tool->UnZip(QString("haffuman2.tmp"));
 
     //获取解压缩结果文件，获取大小，new一个字节流，读进去，设定返回大小，关闭文件，删除文件，返回文件流
     FILE *decompresstmp2 = fopen("haffuman3.tmp", "rb");
@@ -437,6 +437,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
 {
     viewzip(zipfilename);
     if(filecount == 0) return 0;
+    alltime = allcompress = alluncompress = 0.0;
 
     FILE *zipfile = fopen(zipfilename, "rb");
     if(!zipfile)
@@ -445,6 +446,10 @@ bool zipcompression::decompress(char *zipfilename, char* where)
         return 0;
     }
     qDebug()<<filecount;
+    double processvalue = 0;
+    double processstep = 100.0 / filecount;
+    pwidget->init();
+    pwidget->show();
     fseek(zipfile, 0, SEEK_SET);
     for(int i = 0; i < filecount; i ++ )
     {
@@ -453,6 +458,9 @@ bool zipcompression::decompress(char *zipfilename, char* where)
 
         struct localFile *fileheader = (localFile*)tmp;
         DWORD datasize = fileheader->compressed_size;
+
+        allcompress += fileheader->compressed_size;
+        alluncompress += fileheader->uncompressed_size;
 
         char rfilename[1024];
         fread(rfilename, sizeof(BYTE), fileheader->file_name_length, zipfile);
@@ -475,10 +483,16 @@ bool zipcompression::decompress(char *zipfilename, char* where)
             fwrite(out, sizeof(BYTE), outlen, outfile);
             fclose(outfile);
         }
+
+        processvalue += processstep;
+        emit pwidget->onefilecomp(processvalue);
     }
 
     fclose(zipfile);
     qDebug()<<"unzip done";
+
+    pwidget->finish(alltime, allcompress / alluncompress);
+
     return true;
 }
 
@@ -533,11 +547,3 @@ DWORD zipcompression::crc32(DWORD crc, const char *buf, int len)
     return ~crc;
 }
 
-void zipcompression::movefileprocess(double value)
-{
-    qDebug() << "recv fileprocess value: " << value;
-}
-void zipcompression::moveallprocess(double value)
-{
-    qDebug() << "recv allprocess value: " << value;
-}

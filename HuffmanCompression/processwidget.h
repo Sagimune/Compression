@@ -16,6 +16,17 @@ public:
     explicit processwidget(QWidget *parent = nullptr);
     ~processwidget();
 
+    void init();
+    void finish(double alltime, double compressrate);
+
+public slots:
+    void on_finish_clicked();
+    void movefileprocess(double value);
+    void moveallprocess(double value);
+
+signals:
+    void onefilecomp(double value);
+
 private:
     Ui::processwidget *ui;
 
