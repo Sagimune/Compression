@@ -21,8 +21,9 @@ static WORD minutemask = 0x7e0;
 static WORD daymask = 0x1f;
 static WORD monthmask = 0x1e0;
 
-class zipcompression
+class zipcompression:public QObject
 {
+    Q_OBJECT
 public:
     zipcompression();
 
