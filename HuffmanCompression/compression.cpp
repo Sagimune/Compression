@@ -110,7 +110,7 @@ double Compression::Zip(QString path)
     QByteArray a;
     unsigned char ch = 0;
     int num = 0;
-    double Total = 1024.0/8/openfile.size();
+    double Total = 1024.0/openfile.size();
     int ci = 0;
     while(!openfile.atEnd())
     {
@@ -176,7 +176,6 @@ double Compression::UnZip(QString path)
         return 0;
     }
 
-
     double Total = openfile.size();
     clock_t Begin = clock();
     QDataStream in(&openfile);
@@ -187,7 +186,7 @@ double Compression::UnZip(QString path)
         unsigned char ch; in>>ch;
         in>>weightmap[ch];
     }
-    Total -= 4+n;
+    Total -= 32+8*n;
     //emit mysignal(10);
     Container_Init();
     //emit mysignal(20);
@@ -204,6 +203,7 @@ double Compression::UnZip(QString path)
     QDataStream out(&savefile);
     Node *x = container.top();
     double ci = 0;
+    int TTT = 0;
     while(!in.atEnd())
     {
         unsigned char ch; in>>ch;
@@ -218,7 +218,11 @@ double Compression::UnZip(QString path)
                 x = container.top();
             }
         }
-        //emit mysignal(30+70*(ci++)/Total);
+        if(++TTT==128)
+        {
+            TTT = 0;
+            //emit mysignal(std::min(30+70*((ci++)*(128.0/Total)),100.0));
+        }
     }
     openfile.close();
     savefile.close();
