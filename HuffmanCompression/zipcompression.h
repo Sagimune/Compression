@@ -6,6 +6,7 @@
 #include "lzss.h"
 #include <bitset>
 #include "compression.h"
+#include "processwidget.h"
 
 struct drawData
 {
@@ -48,6 +49,18 @@ public:
     bool decompress(char *zipfilename, char* where);
 
     void compressCtrl(char* outfile);
+
+    processwidget *pwidget;
+    double alltime;
+    double allcompress;
+    double alluncompress;
+
+public slots:
+    void movefileprocess(double value);
+    void moveallprocess(double value);
+
+signals:
+    void onefilecomp(double value);
 
 };
 

@@ -21,16 +21,17 @@ SOURCES += \
     lzss.cpp \
     main.cpp \
     mypushbutton.cpp \
+    processwidget.cpp \
     test.cpp \
     viewfiles.cpp \
-    zipcompression.cpp \
-    zipformat.cpp
+    zipcompression.cpp
 
 HEADERS += \
     compression.h \
     framelesswindow.h \
     lzss.h \
     mypushbutton.h \
+    processwidget.h \
     stdatx.h \
     test.h \
     viewfiles.h \
@@ -39,6 +40,7 @@ HEADERS += \
 
 FORMS += \
     framelesswindow.ui \
+    processwidget.ui \
     viewfiles.ui
 
 # Default rules for deployment.

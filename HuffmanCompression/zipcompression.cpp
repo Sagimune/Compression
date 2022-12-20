@@ -8,6 +8,11 @@ zipcompression::zipcompression()
     memset(drawdata, 0, sizeof(drawdata));
     memset(filename, 0, sizeof(filename));
     tool = new Compression;
+    pwidget = new processwidget;
+
+    //connect(tool, SIGNAL(mysignal(double)), this, SLOT(movefileprocess(double)));
+    //connect(tool, SIGNAL(tool->mysignal(double)), this, SLOT(movefileprocess(double)));
+    //connect(this, SIGNAL(onefilecomp(double)), this, SLOT(moveallprocess(double)));
 }
 
 bool zipcompression::ListDirectoryContents(const char *sDir, int len)
@@ -180,7 +185,7 @@ long get_file_size(FILE *stream)
 BYTE* zipcompression::doCompress(int &outlen, char* infilepath)
 {
     //将文件给哈夫曼压缩
-    tool->Zip(QString(infilepath));
+    alltime += tool->Zip(QString(infilepath));
 
     //获取结果文件，获取文件大小，new一个字节流，写入，设定返回大小，关闭，删除文件，返回字节流
     FILE *compresstmp = fopen("haffuman.tmp", "rb");
@@ -205,6 +210,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
 {
     filecount = 0;
     ListDirectoryContents(dir, strlen(dir));
+    if(filecount == 0) return;
 
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
@@ -224,6 +230,11 @@ void zipcompression::compressionDir(char* dir, char* outfile)
     int uncompress_size = 0;
 
     offset = 0;
+
+    double processvalue = 0;
+    double processstep = 100 / filecount;
+    alltime = allcompress = alluncompress = 0.0;
+    pwidget->show();
     for(int i = 0; i < filecount; i ++ )
     {
         char filepath[1024];
@@ -231,6 +242,14 @@ void zipcompression::compressionDir(char* dir, char* outfile)
         lfsize += pack_onefileheader(filepath, filename[i] + 1, 0, output, crc_32, compress_size, uncompress_size);
         cdsize += pack_onecdheader(filepath, filename[i] + 1, 0, tmpcdfile, compress_size, uncompress_size, crc_32, offset);
         offset = lfsize;
+
+        allcompress += compress_size;
+        alluncompress == uncompress_size;
+
+        processvalue += processstep;
+        emit onefilecomp(processvalue);
+
+        if(i == filecount - 1) emit onefilecomp(100.0);
     }
     gfilecount = filecount;
 
@@ -264,6 +283,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
 void zipcompression::compressionFile(char* outfile, int infilecount)
 {
     filecount = infilecount;
+    if(filecount == 0) return;
 
     FILE* output = fopen(outfile, "wb");
     FILE* tmpcdfile = fopen("tmp.tmp", "wb+");
@@ -280,13 +300,25 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     DWORD lfsize, cdsize, crc_32, offset;
     int compress_size = 0;
     int uncompress_size = 0;
-
     lfsize = cdsize = crc_32 = offset = 0;
+
+    double processvalue = 0;
+    double processstep = 100 / filecount;
+    alltime = allcompress = alluncompress = 0.0;
+    pwidget->show();
     for(int i = 0; i < filecount; i ++ )
     {
         lfsize += pack_onefileheader(filepath[i], filename[i], 0, output, crc_32, compress_size, uncompress_size);
         cdsize += pack_onecdheader(filepath[i], filename[i], 0, tmpcdfile, compress_size, uncompress_size, crc_32, offset);
         offset = lfsize;
+
+        allcompress += compress_size;
+        alluncompress == uncompress_size;
+
+        processvalue += processstep;
+        emit onefilecomp(processvalue);
+
+        if(i == filecount - 1) emit onefilecomp(100.0);
     }
 
     fclose(tmpcdfile);
@@ -317,6 +349,8 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     fwrite(&footer, sizeof(footer), 1, output);
 
     fclose(output);
+
+
 }
 
 BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
@@ -402,6 +436,7 @@ bool zipcompression::viewzip(char *zipfilename)
 bool zipcompression::decompress(char *zipfilename, char* where)
 {
     viewzip(zipfilename);
+    if(filecount == 0) return 0;
 
     FILE *zipfile = fopen(zipfilename, "rb");
     if(!zipfile)
@@ -496,4 +531,13 @@ DWORD zipcompression::crc32(DWORD crc, const char *buf, int len)
         crc = (crc >> 8) ^ table[(crc & 0xff) ^ octet];
     }
     return ~crc;
+}
+
+void zipcompression::movefileprocess(double value)
+{
+    qDebug() << "recv fileprocess value: " << value;
+}
+void zipcompression::moveallprocess(double value)
+{
+    qDebug() << "recv allprocess value: " << value;
 }
