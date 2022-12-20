@@ -10,7 +10,7 @@ zipcompression::zipcompression()
     tool = new Compression;
     pwidget = new processwidget;
 
-    //connect(tool, SIGNAL(tool->mysignal(double)), pwidget, SLOT(pwidget->movefileprocess(double)));
+    connect(tool, SIGNAL(tool->mysignal(double)), pwidget, SLOT(pwidget->movefileprocess(double)));
     //connect(tool, SIGNAL(tool->mysignal(double)), this, SLOT(movefileprocess(double)));
     //connect(this, SIGNAL(onefilecomp(double)), this, SLOT(moveallprocess(double)));
 }

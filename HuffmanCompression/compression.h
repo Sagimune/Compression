@@ -27,6 +27,7 @@ struct CMP
 
 class Compression : public QMainWindow
 {
+    Q_OBJECT
 private:
     QMap<unsigned char,unsigned int> weightmap;
     std::priority_queue<Node*,std::vector<Node*>,CMP> container;
