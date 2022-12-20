@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>process</string>
   </property>
   <widget class="QProgressBar" name="allprocess">
    <property name="geometry">
