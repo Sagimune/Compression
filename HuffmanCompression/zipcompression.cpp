@@ -55,6 +55,30 @@ bool zipcompression::ListDirectoryContents(const char *sDir, int len)
     return true;
 }
 
+
+long get_file_size(FILE *stream)
+{
+    long file_size = -1;
+    long cur_offset = ftell(stream);	// 获取当前偏移位置
+    if (cur_offset == -1) {
+        printf("ftell failed :%s\n", strerror(errno));
+        return -1;
+    }
+    if (fseek(stream, 0, SEEK_END) != 0) {	// 移动文件指针到文件末尾
+        printf("fseek failed: %s\n", strerror(errno));
+        return -1;
+    }
+    file_size = ftell(stream);	// 获取此时偏移值，即文件大小
+    if (file_size == -1) {
+        printf("ftell failed :%s\n", strerror(errno));
+    }
+    if (fseek(stream, cur_offset, SEEK_SET) != 0) {	// 将文件指针恢复初始位置
+        printf("fseek failed: %s\n", strerror(errno));
+        return -1;
+    }
+    return file_size;
+}
+
 DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int method, FILE* output, DWORD &crc_32, int &compress_size, int &uncompress_size)
 {
     //localFile
@@ -74,7 +98,7 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
     else
     {
 
-        BYTE data[BLOCKSIZE];
+
         FILE* file = fopen(infilepath, "rb");
         if(!file)
         {
@@ -83,7 +107,10 @@ DWORD zipcompression::pack_onefileheader(char* infilepath, char* infilename, int
         }
 
         //motify inlen & data
-        uncompress_size = fread(&data, sizeof(BYTE), BLOCKSIZE, file);
+        //uncompress_size = fread(&data, sizeof(BYTE), BLOCKSIZE, file);
+        uncompress_size = get_file_size(file);
+        BYTE *data = new BYTE[uncompress_size];
+        fread(data, sizeof(BYTE), uncompress_size, file);
         fclose(file);
 
         //motify outlen & data
@@ -158,28 +185,6 @@ DWORD zipcompression::pack_onecdheader(char* infilepath, char* infilename, int m
     return cdsize;
 }
 
-long get_file_size(FILE *stream)
-{
-    long file_size = -1;
-    long cur_offset = ftell(stream);	// 获取当前偏移位置
-    if (cur_offset == -1) {
-        printf("ftell failed :%s\n", strerror(errno));
-        return -1;
-    }
-    if (fseek(stream, 0, SEEK_END) != 0) {	// 移动文件指针到文件末尾
-        printf("fseek failed: %s\n", strerror(errno));
-        return -1;
-    }
-    file_size = ftell(stream);	// 获取此时偏移值，即文件大小
-    if (file_size == -1) {
-        printf("ftell failed :%s\n", strerror(errno));
-    }
-    if (fseek(stream, cur_offset, SEEK_SET) != 0) {	// 将文件指针恢复初始位置
-        printf("fseek failed: %s\n", strerror(errno));
-        return -1;
-    }
-    return file_size;
-}
 
 BYTE* zipcompression::doCompress(int &outlen, char* infilepath)
 {
@@ -278,6 +283,7 @@ void zipcompression::compressionDir(char* dir, char* outfile)
     fclose(output);
 
     pwidget->finish(alltime, allcompress / alluncompress);
+    qDebug() << "compressDir: finish. time: " << alltime << " allcompress: " << allcompress << " alluncompress: " << alluncompress << " rate: " << allcompress / alluncompress;
 }
 
 void zipcompression::compressionFile(char* outfile, int infilecount)
@@ -350,6 +356,7 @@ void zipcompression::compressionFile(char* outfile, int infilecount)
     fclose(output);
 
     pwidget->finish(alltime, allcompress / alluncompress);
+    qDebug() << "compressFile: finish. time: " << alltime << " allcompress: " << allcompress << " alluncompress: " << alluncompress << " rate: " << allcompress / alluncompress;
 }
 
 BYTE* zipcompression::doDecompress(FILE* zipfile, int inlen, int &outlen)
@@ -491,6 +498,7 @@ bool zipcompression::decompress(char *zipfilename, char* where)
     qDebug()<<"unzip done";
 
     pwidget->finish(alltime, allcompress / alluncompress);
+    qDebug() << "deCompress: finish. time: " << alltime << " allcompress: " << allcompress << " alluncompress: " << alluncompress << " rate: " << allcompress / alluncompress;
 
     return true;
 }
