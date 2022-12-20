@@ -26,22 +26,26 @@ struct FramelessWindowPrivate {
 
 };
 int i = 1;
+/*圆角窗口的设置将原本的窗口隐藏，导入另外一个窗口，同时将本来的窗口
+隐藏，没有使用ui进行布局，直接安排位置，最大化，最小化还有关闭按钮将
+本来窗口上的隐藏，同时自己进行重写，同时将各种功能按钮进行连接*/
 FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWidget(parent) {
-    setWindowFlags(Qt::FramelessWindowHint);    // 去掉边框
-    setAttribute(Qt::WA_TranslucentBackground); // 背景透明
-    addButton = new QPushButton(" 添加 ");
-    yasuoButton = new QPushButton(" 压缩 ");
-    jieyaButton = new QPushButton(" 解压 ");
+    setWindowFlags(Qt::FramelessWindowHint);      // 去掉边框
+    setAttribute(Qt::WA_TranslucentBackground);   // 背景透明
+    addButton = new QPushButton(" 添加 ");        //添加按钮
+    yasuoButton = new QPushButton(" 压缩 ");      //压缩按钮
+    jieyaButton = new QPushButton(" 解压 ");      //解压按钮
     layout = new QVBoxLayout();
-    text = new QTextEdit(contentWidget);
-    text->setGeometry(5,30,1180,300);
+    text = new QTextEdit(contentWidget);        //添加文本框
+    text->setGeometry(5,30,1180,300);           //确定文本框大小
     text->show();
-    text->setStyleSheet("QTextEdit{border-radius:9px;}");
+    text->setStyleSheet("QTextEdit{border-radius:9px;}");//文本框圆角设置
 
     QLineEdit *pathedit = new QLineEdit(contentWidget);
     pathedit->setGeometry(5,345,300,40);
     pathedit->setText("1.huffmanzip");
     pathedit->setStyleSheet("QLineEdit{border-radius:9px;}");
+    /*定义一个文本框作为新建压缩包的命名，并将新建的压缩包命名为1.huffmanzip，可以在程序中自定义压缩包的名字*/
     mypushbutton *exit = new mypushbutton(":/new/prefix1/Resoures/close.png");
     exit->setGeometry(1160,0,25,25);
     exit->setParent(contentWidget);
@@ -51,7 +55,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         contentWidget->close();
     });
     exit->show();
-
+    /*在去除自带的关闭按钮后，自己设计关闭按钮*/
     mypushbutton *zuidahua = new mypushbutton(":/new/prefix1/Resoures/bigger.png");
     zuidahua->setGeometry(1135,0,25,25);
     zuidahua->setParent(contentWidget);
@@ -101,9 +105,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         qDebug()<<"path"<<i<<" :"<<test->filepath[i];
         qDebug()<<"name"<<i<<" :"<<test->filename[i];
         QByteArray ba = fileName.toLatin1(); // must
-        //sprintf(ch, "%s", ba.data());
 
-        //qDebug()<<ch;
         QString savepath=QFileDialog::getExistingDirectory(this," 选择一个目录 ","./",QFileDialog::ShowDirsOnly);
         savepath.append("\\\\");
         QString name = pathedit->text();
@@ -121,6 +123,8 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
 
     });
     newfile->show();
+    /*新建文件夹按钮，读取文本框中的单个或多个文件路径，和自己选择压缩文件的输出路径，包含对于读取路径的处理使之符合函数的要求
+    自己选择文件输出的路径是通过新建一个窗口来实现的，方便使用者选择输出路径*/
 
     mypushbutton *openfile = new mypushbutton(":/new/prefix1/Resoures/openfile.jpg");
     openfile->setGeometry(700,400,25,30);
@@ -136,6 +140,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         viewfiles *view = new viewfiles(ch);
         view->show();
     });
+    /*对于文本框中的压缩包进行观看，显示文本框中压缩包的内容*/
     mypushbutton *zuixiaohua = new mypushbutton(":/new/prefix1/Resoures/hide.png");
     zuixiaohua->setGeometry(1110,0,25,25);
     zuixiaohua->setParent(contentWidget);
@@ -145,6 +150,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         this->lower();
         contentWidget->lower();
     });
+    /*因为删掉了隐藏窗口按钮，所以在这里重新设计并实现窗口的隐藏*/
     mypushbutton *jieya = new mypushbutton(":/new/prefix1/Resoures/jieya.png");
     jieya->setGeometry(475,400,25,30);
     jieya->setParent(contentWidget);
@@ -179,6 +185,7 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
 
         // must
     });
+    /*解压按钮，读取文本框中的压缩包名称，并选择解压文件的输出路径，在文件解压时会有进度条来提示解压什么时候完成*/
     connect(zuidahua,&QPushButton::clicked,[=]()
     {
         if(i%2!=0)
@@ -211,13 +218,14 @@ FramelessWindow::FramelessWindow(QWidget *contentWidget, QWidget *parent) : QWid
         }
     });
     zuidahua->show();
-
+    /*删除了自带的最大化按钮，为了符合整体程序的设计风格，对于最大化按钮进行重新设计，
+     在初次点击最大化按钮会将程序最大化，在此点击会恢复默认大小，通过一个计数器来实现对于最大化和恢复默认信号的识别*/
 
     contentWidget->setLayout(layout);
     contentWidget->setObjectName("contentWidget");
     contentWidget->setStyleSheet("#contentWidget{background: lightblue; border-radius: 4px;}" // 定制圆角
                                  ".QLabel{background: blue;}.QTextEdit{background: white;}");
-
+    /*对于传入的窗口进行阴影的添加，设计窗口*/
 
 
     // 创建无边框、有阴影、可拖动的窗口
