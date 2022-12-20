@@ -70,7 +70,7 @@ void Compression::ZipPassword_Init(Node *x, std::string s)
     if(x->R!=NULL) ZipPassword_Init(x->R,s+'1');
 }
 
-void Compression::Zip(QString path)
+double Compression::Zip(QString path)
 {
     //emit mysignal(0);
     QFile openfile(path);
@@ -78,13 +78,13 @@ void Compression::Zip(QString path)
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败"));
         //emit error();
-        return;
+        return 0;
     }
     if(openfile.size()==0)
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
         //emit error();
-        return;
+        return 0;
     }
     clock_t Begin = clock();
     Weightmap_Init(openfile);
@@ -150,29 +150,30 @@ void Compression::Zip(QString path)
     //emit mysignal(100);
 
     qDebug()<<"ZipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+    return double(clock()-Begin)/CLOCKS_PER_SEC;
 }
 
-void Compression::UnZip(QString path)
+double Compression::UnZip(QString path)
 {
     //emit mysignal(0);
     if(path.right(13)!="haffuman2.tmp")//if(path.right(11)!=".huffmanzip")
     {
         QMessageBox::warning(NULL,QString("警告"),QString("此文件非哈夫曼压缩文件 "));
         //emit error();
-        return;
+        return 0;
     }
     QFile openfile(path);
     if(!openfile.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件打开失败 "));
         //emit error();
-        return;
+        return 0;
     }
     if(openfile.size()==0)
     {
         QMessageBox::warning(NULL,QString("警告"),QString("文件为空"));
         //emit error();
-        return;
+        return 0;
     }
 
 
@@ -229,4 +230,5 @@ void Compression::UnZip(QString path)
     //emit mysignal(100);
 
     qDebug()<<"UnzipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
+    return double(clock()-Begin)/CLOCKS_PER_SEC;
 }
