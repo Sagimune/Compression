@@ -9,6 +9,7 @@ Compression::Compression()
 }
 
 void Compression::DEL(Node* x)
+// 删除哈夫曼树
 {
     if(x==NULL) return;
     DEL(x->L),DEL(x->R);
@@ -17,6 +18,7 @@ void Compression::DEL(Node* x)
 }
 
 void Compression::Weightmap_Init(QFile& in)
+// 统计字符权重map初始化
 {
     QByteArray a;
     while(!in.atEnd())
@@ -31,6 +33,7 @@ void Compression::Weightmap_Init(QFile& in)
 }
 
 void Compression::Container_Init()
+// 哈夫曼树叶子节点建立
 {
     for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
     {
@@ -44,6 +47,7 @@ void Compression::Container_Init()
 }
 
 void Compression::HuffmanTree_Init()
+// 建立哈夫曼树
 {
     while(container.size()>1)
     {
@@ -61,6 +65,7 @@ void Compression::HuffmanTree_Init()
 }
 
 void Compression::ZipPassword_Init(Node *x, std::string s)
+// 建立加密map，将源码和密文一一对应
 {
     if(x!=NULL&&x->leaf)
     {
@@ -71,6 +76,7 @@ void Compression::ZipPassword_Init(Node *x, std::string s)
 }
 
 double Compression::Zip(QString path)
+// 压缩函数
 {
     emit mysignal(0);
     QFile openfile(path);
@@ -105,6 +111,7 @@ double Compression::Zip(QString path)
     out<<(weightmap.size()==256 ? 0 : weightmap.size());
     for(QMap<unsigned char,unsigned int>::iterator it = weightmap.begin(); it != weightmap.end(); it++)
         out<<it.key()<<it.value();
+    // 输出源码和权值
     emit mysignal(50);
     openfile.seek(0);
     QByteArray a;
@@ -127,10 +134,12 @@ double Compression::Zip(QString path)
                 {
                     out<<ch;
                     num = ch = 0;
+                    // 积累到8位成unsigned char 输出
                 }
             }
         }
         emit mysignal(50+50.0*((ci++)*Total));
+        // 进度条相应增加
     }
     if(num)
     {
@@ -146,14 +155,18 @@ double Compression::Zip(QString path)
     container.pop();
     weightmap.clear();
     passwordmap.clear();
+    // 处理完后清空
 
     emit mysignal(100);
+    // 进度条到100
 
     qDebug()<<"ZipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
     return double(clock()-Begin)/CLOCKS_PER_SEC;
+    // 用时
 }
 
 double Compression::UnZip(QString path)
+// 解压函数
 {
     emit mysignal(0);
     if(path.right(13)!="haffuman2.tmp")//if(path.right(11)!=".huffmanzip")
@@ -216,6 +229,7 @@ double Compression::UnZip(QString path)
             {
                 out<<x->C;
                 x = container.top();
+                // 跳到叶子节点后指针返回 并输出
             }
         }
         if(++TTT==128)
@@ -235,4 +249,5 @@ double Compression::UnZip(QString path)
 
     qDebug()<<"UnzipTime:"<<QString::number(double(clock()-Begin)/CLOCKS_PER_SEC);
     return double(clock()-Begin)/CLOCKS_PER_SEC;
+    // 用时
 }
